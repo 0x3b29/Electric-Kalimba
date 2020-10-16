@@ -130,7 +130,7 @@ void addEvent(MyEvent* newEvent)
     }
 }
 
-void eventParser(String what)
+void parseEvent(String what)
 {
     if (what.startsWith("relax"))
     {
@@ -347,7 +347,7 @@ void loop()
         // Serial.print(headNode->getWhen());
         // Serial.println(" is now due " + headNode->getWhat());      
         
-        eventParser(headNode->getWhat());
+        parseEvent(headNode->getWhat());
         nodeToDelete = headNode;
         headNode = headNode->getNext();
         delete nodeToDelete;
