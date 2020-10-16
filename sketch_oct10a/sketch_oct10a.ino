@@ -1,4 +1,6 @@
 #include <Adafruit_PWMServoDriver.h>
+#include "MyEvent.h"
+
 Adafruit_PWMServoDriver leftServoBoard = Adafruit_PWMServoDriver(0x40);    //Create an object of board 1
 Adafruit_PWMServoDriver rightServoBoard = Adafruit_PWMServoDriver(0x41);    //Create an object of board 2 
 
@@ -22,60 +24,6 @@ bool rightServosUp[8];
 
 String serialInput;
 String notesString;
-
-class MyEvent
-{
-    private:
-    unsigned long when;
-    String what;
-
-    MyEvent* next;
-    MyEvent* previous;
-
-    public: 
-    MyEvent(long when, String what)
-    {
-        this->when = when;
-        this->what = what;
-
-        //  Serial.print("I am due at: '");
-        //  Serial.print(when);
-        //  Serial.println("'");
-
-        next = NULL;
-        previous = NULL;
-    }
-
-    void setNext(MyEvent* next)
-    {
-        this->next = next;
-    }
-
-    MyEvent* getNext()
-    {
-        return this->next; 
-    }
-
-    void setPrevious(MyEvent* previous)
-    {
-        this->previous = previous;
-    }
-
-    MyEvent* getPrevious()
-    {
-        return this->previous; 
-    }
-
-    unsigned long getWhen()
-    {
-        return this->when;
-    }
-
-    String getWhat()
-    {
-        return this->what;
-    }
-};
 
 MyEvent* headNode;
 MyEvent* nodeToDelete;
