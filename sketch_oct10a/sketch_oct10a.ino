@@ -22,56 +22,56 @@ bool rightServosUp[8];
 
 class MyEvent
 {
-  private:
-  unsigned long when;
-  String what;
+    private:
+    unsigned long when;
+    String what;
 
-  MyEvent* next;
-  MyEvent* previous;
-  
-  public: 
-  MyEvent(long when, String what)
-  {
-    this->when = when;
-    this->what = what;
+    MyEvent* next;
+    MyEvent* previous;
 
-//    Serial.print("I am due at: '");
-//    Serial.print(when);
-//    Serial.println("'");
+    public: 
+    MyEvent(long when, String what)
+    {
+        this->when = when;
+        this->what = what;
 
-    next = NULL;
-    previous = NULL;
-  }
+        //  Serial.print("I am due at: '");
+        //  Serial.print(when);
+        //  Serial.println("'");
 
-  void setNext(MyEvent* next)
-  {
-    this->next = next;
-  }
+        next = NULL;
+        previous = NULL;
+    }
 
-  MyEvent* getNext()
-  {
-    return this->next; 
-  }
+    void setNext(MyEvent* next)
+    {
+        this->next = next;
+    }
 
-  void setPrevious(MyEvent* previous)
-  {
-    this->previous = previous;
-  }
+    MyEvent* getNext()
+    {
+        return this->next; 
+    }
 
-  MyEvent* getPrevious()
-  {
-    return this->previous; 
-  }
+    void setPrevious(MyEvent* previous)
+    {
+        this->previous = previous;
+    }
 
-  unsigned long getWhen()
-  {
-    return this->when;
-  }
+    MyEvent* getPrevious()
+    {
+        return this->previous; 
+    }
 
-  String getWhat()
-  {
-    return this->what;
-  }
+    unsigned long getWhen()
+    {
+        return this->when;
+    }
+
+    String getWhat()
+    {
+        return this->what;
+    }
 };
 
 
