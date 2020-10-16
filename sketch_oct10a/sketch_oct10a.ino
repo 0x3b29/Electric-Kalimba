@@ -233,6 +233,7 @@ int val;
 String str;
 
 MyEvent* headNode;
+MyEvent* nodeToDelete;
 
 void eventParser(String what)
 {
@@ -346,7 +347,10 @@ void loop()
         Serial.print(headNode->getWhen());
         Serial.println(" is now due " + headNode->getWhat());
         eventParser(headNode->getWhat());
+        nodeToDelete = headNode;
         headNode = headNode->getNext();
+        delete nodeToDelete;
+        nodeToDelete = NULL;
     }
 
     if (Serial.available() > 0)
