@@ -37,9 +37,9 @@ class MyEvent
     this->when = when;
     this->what = what;
 
-    Serial.print("I am due at: '");
-    Serial.print(when);
-    Serial.println("'");
+//    Serial.print("I am due at: '");
+//    Serial.print(when);
+//    Serial.println("'");
 
     next = NULL;
     previous = NULL;
@@ -279,12 +279,13 @@ void addEvent(MyEvent* newEvent)
     
     if (headNode == NULL)
     {
-        Serial.println("Event was first");
+        // Serial.println("Event was first");
+        
         headNode = newEvent;
     }
     else if (currentNode == NULL)
     {
-        Serial.println("Event was last");
+        // Serial.println("Event was last");
                 
         newEvent->setPrevious(previousNode);
         previousNode->setNext(newEvent);
@@ -293,7 +294,7 @@ void addEvent(MyEvent* newEvent)
     {
         if (currentNode == headNode)
         {
-            Serial.print("Event will be new head");
+            // Serial.print("Event will be new head");
             headNode->setPrevious(newEvent);
             newEvent->setNext(headNode);
 
@@ -301,10 +302,10 @@ void addEvent(MyEvent* newEvent)
         }
         else
         {
-            Serial.print("Event was inbetween ");
-            Serial.print(currentNode->getPrevious()->getWhen());
-            Serial.print(" and ");
-            Serial.println(currentNode->getWhen());
+            // Serial.print("Event was inbetween ");
+            // Serial.print(currentNode->getPrevious()->getWhen());
+            // Serial.print(" and ");
+            // Serial.println(currentNode->getWhen());
 
             newEvent->setPrevious(currentNode->getPrevious());
             newEvent->setNext(currentNode);
@@ -319,7 +320,7 @@ String input;
 
 void processString()
 {
-    Serial.println("input: '" + input + "'");
+    // Serial.println("input: '" + input + "'");
 
     if (input.indexOf(',') > 0)
     {
@@ -340,12 +341,15 @@ void processString()
     }
 }
 
+
+
 void loop()
 {
     while (headNode != NULL && headNode->getWhen() < millis())
     {
-        Serial.print(headNode->getWhen());
-        Serial.println(" is now due " + headNode->getWhat());
+        // Serial.print(headNode->getWhen());
+        // Serial.println(" is now due " + headNode->getWhat());      
+        
         eventParser(headNode->getWhat());
         nodeToDelete = headNode;
         headNode = headNode->getNext();
