@@ -341,8 +341,6 @@ void processString()
     }
 }
 
-
-
 void loop()
 {
     while (headNode != NULL && headNode->getWhen() < millis())
@@ -359,15 +357,7 @@ void loop()
 
     if (Serial.available() > 0)
     {    
-        //Serial.readBytes(readData, 15);
-        // val = Serial.parseInt();
-        // Serial.println(val);
         str = Serial.readString();
-        //x = Serial.parseInt();
-        //char str[32] = "";
-        //array_to_string(readData, 15, str);
-        // Serial.println(str);
-
         Serial.println("Got '" + str + "'");
 
         if (str.charAt(0) == 'c')
