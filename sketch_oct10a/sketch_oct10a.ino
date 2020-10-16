@@ -76,18 +76,22 @@ class MyEvent
 
 
 void setup() {
-  // put your setup code here, to run once:
-  Serial.begin(115200);
-    
-  leftServoBoard.begin();             //Start each board
-  rightServoBoard.begin();
-  leftServoBoard.setOscillatorFrequency(27000000);    //Set the PWM oscillator frequency, used for fine calibration
-  rightServoBoard.setOscillatorFrequency(27000000);
-  leftServoBoard.setPWMFreq(servoFrequency);          //Set the servo operating frequency
-  rightServoBoard.setPWMFreq(servoFrequency);
+    Serial.begin(115200);
 
-  Serial.println("Up");
-  up();
+    //Start each board
+    leftServoBoard.begin();             
+    rightServoBoard.begin();
+
+    //Set the PWM oscillator frequency, used for fine calibration
+    leftServoBoard.setOscillatorFrequency(27000000);    
+    rightServoBoard.setOscillatorFrequency(27000000);
+
+    //Set the servo operating frequency
+    leftServoBoard.setPWMFreq(servoFrequency);          
+    rightServoBoard.setPWMFreq(servoFrequency);
+
+    Serial.println("Initialize Up");
+    up();
 }
 
 void setServoPosition(int board, int servo, int position)
