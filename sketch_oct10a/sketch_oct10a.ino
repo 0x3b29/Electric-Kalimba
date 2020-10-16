@@ -226,7 +226,7 @@ void playNote (int note)
   }
 }
 
-int val;
+
 
 String str;
 
@@ -383,7 +383,7 @@ void loop()
         }
         else
         {
-            val = str.toInt();
+            int val = str.toInt();
 
             if (val > 0)
             {
