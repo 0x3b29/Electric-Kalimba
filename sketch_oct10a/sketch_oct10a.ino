@@ -20,6 +20,9 @@ int rightServosUpPositions[8] = {62, 55, 64, 65, 66, 69, 71, 73};
 bool leftServosUp[9];
 bool rightServosUp[8];
 
+String serialInput;
+String notesString;
+
 class MyEvent
 {
     private:
@@ -74,24 +77,88 @@ class MyEvent
     }
 };
 
+MyEvent* headNode;
+MyEvent* nodeToDelete;
 
-void setup() {
-    Serial.begin(115200);
+void addEvent(MyEvent* newEvent)
+{
+    MyEvent* previousNode = NULL;
+    MyEvent* currentNode = headNode;
 
-    //Start each board
-    leftServoBoard.begin();             
-    rightServoBoard.begin();
+    while (currentNode != NULL && newEvent->getWhen() > currentNode->getWhen())
+    {
+        previousNode = currentNode;
+        currentNode = currentNode->getNext();
+    }
+    
+    if (headNode == NULL)
+    {
+        // Serial.println("Event was first");
+        
+        headNode = newEvent;
+    }
+    else if (currentNode == NULL)
+    {
+        // Serial.println("Event was last");
+                
+        newEvent->setPrevious(previousNode);
+        previousNode->setNext(newEvent);
+    }
+    else
+    {
+        if (currentNode == headNode)
+        {
+            // Serial.print("Event will be new head");
+            headNode->setPrevious(newEvent);
+            newEvent->setNext(headNode);
 
-    //Set the PWM oscillator frequency, used for fine calibration
-    leftServoBoard.setOscillatorFrequency(27000000);    
-    rightServoBoard.setOscillatorFrequency(27000000);
+            headNode = newEvent;
+        }
+        else
+        {
+            // Serial.print("Event was inbetween ");
+            // Serial.print(currentNode->getPrevious()->getWhen());
+            // Serial.print(" and ");
+            // Serial.println(currentNode->getWhen());
 
-    //Set the servo operating frequency
-    leftServoBoard.setPWMFreq(servoFrequency);          
-    rightServoBoard.setPWMFreq(servoFrequency);
+            newEvent->setPrevious(currentNode->getPrevious());
+            newEvent->setNext(currentNode);
 
-    Serial.println("Initialize Up");
-    up();
+            currentNode->getPrevious()->setNext(newEvent);
+            currentNode->setPrevious(newEvent);
+        }
+    }
+}
+
+void eventParser(String what)
+{
+    if (what.startsWith("relax"))
+    {
+        // Serial.println("Got " + what);
+
+        int comma1Index = what.indexOf(',');
+        int comma2Index = what.indexOf(',', comma1Index + 1);
+        int comma3Index = what.indexOf(',', comma2Index + 1);
+
+        String command = what.substring(0, comma1Index);
+        String firstArg = what.substring(comma1Index + 1, comma2Index);
+        String secondArg = what.substring(comma2Index + 1, comma3Index);
+        String thirdArg = what.substring(comma3Index + 1, what.length());
+
+        /*
+        Serial.println("command " + command);
+        Serial.println("firstArg " + firstArg);
+        Serial.println("secondArg " + secondArg);
+        Serial.println("thirdArg " + thirdArg);
+        */
+
+        setServoPosition(firstArg.toInt(), secondArg.toInt(), thirdArg.toInt());
+    }
+  
+    if (what.startsWith("process"))
+    {
+        processNotesString();
+    }
 }
 
 void setServoPosition(int board, int servo, int position)
@@ -230,96 +297,6 @@ void playNote (int note)
   }
 }
 
-
-
-String serialInput;
-
-MyEvent* headNode;
-MyEvent* nodeToDelete;
-
-void eventParser(String what)
-{
-    if (what.startsWith("relax"))
-    {
-        // Serial.println("Got " + what);
-
-        int comma1Index = what.indexOf(',');
-        int comma2Index = what.indexOf(',', comma1Index + 1);
-        int comma3Index = what.indexOf(',', comma2Index + 1);
-
-        String command = what.substring(0, comma1Index);
-        String firstArg = what.substring(comma1Index + 1, comma2Index);
-        String secondArg = what.substring(comma2Index + 1, comma3Index);
-        String thirdArg = what.substring(comma3Index + 1, what.length());
-
-        /*
-        Serial.println("command " + command);
-        Serial.println("firstArg " + firstArg);
-        Serial.println("secondArg " + secondArg);
-        Serial.println("thirdArg " + thirdArg);
-        */
-
-        setServoPosition(firstArg.toInt(), secondArg.toInt(), thirdArg.toInt());
-    }
-  
-    if (what.startsWith("process"))
-    {
-        processNotesString();
-    }
-}
-
-void addEvent(MyEvent* newEvent)
-{
-    MyEvent* previousNode = NULL;
-    MyEvent* currentNode = headNode;
-
-    while (currentNode != NULL && newEvent->getWhen() > currentNode->getWhen())
-    {
-        previousNode = currentNode;
-        currentNode = currentNode->getNext();
-    }
-    
-    if (headNode == NULL)
-    {
-        // Serial.println("Event was first");
-        
-        headNode = newEvent;
-    }
-    else if (currentNode == NULL)
-    {
-        // Serial.println("Event was last");
-                
-        newEvent->setPrevious(previousNode);
-        previousNode->setNext(newEvent);
-    }
-    else
-    {
-        if (currentNode == headNode)
-        {
-            // Serial.print("Event will be new head");
-            headNode->setPrevious(newEvent);
-            newEvent->setNext(headNode);
-
-            headNode = newEvent;
-        }
-        else
-        {
-            // Serial.print("Event was inbetween ");
-            // Serial.print(currentNode->getPrevious()->getWhen());
-            // Serial.print(" and ");
-            // Serial.println(currentNode->getWhen());
-
-            newEvent->setPrevious(currentNode->getPrevious());
-            newEvent->setNext(currentNode);
-
-            currentNode->getPrevious()->setNext(newEvent);
-            currentNode->setPrevious(newEvent);
-        }
-    }
-}
-
-String notesString;
-
 void processNotesString()
 {
     // Serial.println("notesString: '" + notesString + "'");
@@ -341,6 +318,26 @@ void processNotesString()
         
         addEvent(new MyEvent(millis() + secondValue.toInt(), "process"));       
     }
+}
+
+void setup() 
+{
+    Serial.begin(115200);
+
+    //Start each board
+    leftServoBoard.begin();             
+    rightServoBoard.begin();
+
+    //Set the PWM oscillator frequency, used for fine calibration
+    leftServoBoard.setOscillatorFrequency(27000000);    
+    rightServoBoard.setOscillatorFrequency(27000000);
+
+    //Set the servo operating frequency
+    leftServoBoard.setPWMFreq(servoFrequency);          
+    rightServoBoard.setPWMFreq(servoFrequency);
+
+    Serial.println("Initialize Up");
+    up();
 }
 
 void loop()
