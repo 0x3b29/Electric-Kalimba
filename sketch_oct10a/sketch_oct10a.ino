@@ -260,7 +260,7 @@ void eventParser(String what)
   
     if (what.startsWith("process"))
     {
-        processString();
+        processNotesString();
     }
 }
 
@@ -314,18 +314,18 @@ void addEvent(MyEvent* newEvent)
     }
 }
 
-String input;
+String notesString;
 
-void processString()
+void processNotesString()
 {
-    // Serial.println("input: '" + input + "'");
+    // Serial.println("notesString: '" + notesString + "'");
 
-    if (input.indexOf(',') > 0)
+    if (notesString.indexOf(',') > 0)
     {
-        int colonIndex = input.indexOf(';');
+        int colonIndex = notesString.indexOf(';');
     
-        String data = input.substring(0, colonIndex);
-        input.remove(0, colonIndex + 1);
+        String data = notesString.substring(0, colonIndex);
+        notesString.remove(0, colonIndex + 1);
         
         int commaIndex = data.indexOf(',');
         String firstValue = data.substring(0, commaIndex);
@@ -378,8 +378,8 @@ void loop()
 
         if (str.indexOf(',') > 0)
         {
-            input = str;
-            processString();
+            notesString = str;
+            processNotesString();
         }
         else
         {
