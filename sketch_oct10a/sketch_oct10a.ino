@@ -17,8 +17,6 @@ int rightServosDownPositions[8] = {130, 130, 130, 130, 130, 130, 130, 130};
 int board2ServoCenterPos[8] = {85, 85, 85, 90, 91, 92, 93, 94};
 int rightServosUpPositions[8] = {62, 55, 64, 65, 66, 69, 71, 73};
 
-char readData[16];//The character array is used as buffer to read into.
-
 bool leftServosUp[9];
 bool rightServosUp[8];
 
