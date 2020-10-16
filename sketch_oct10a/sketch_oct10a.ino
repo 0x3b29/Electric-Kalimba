@@ -228,7 +228,7 @@ void playNote (int note)
 
 
 
-String str;
+String serialInput;
 
 MyEvent* headNode;
 MyEvent* nodeToDelete;
@@ -355,35 +355,35 @@ void loop()
 
     if (Serial.available() > 0)
     {    
-        str = Serial.readString();
-        Serial.println("Got '" + str + "'");
+        serialInput = Serial.readString();
+        Serial.println("Got '" + serialInput + "'");
 
-        if (str.charAt(0) == 'c')
+        if (serialInput.charAt(0) == 'c')
         {
             Serial.println("Centering ...");
             center();
         }
 
-        if (str.charAt(0) == 'u')
+        if (serialInput.charAt(0) == 'u')
         {
             Serial.println("Upping ...");
             up();
         }
 
-        if (str.charAt(0) == 'd')
+        if (serialInput.charAt(0) == 'd')
         {
             Serial.println("Downing ...");
             down();
         }
 
-        if (str.indexOf(',') > 0)
+        if (serialInput.indexOf(',') > 0)
         {
-            notesString = str;
+            notesString = serialInput;
             processNotesString();
         }
         else
         {
-            int val = str.toInt();
+            int val = serialInput.toInt();
 
             if (val > 0)
             {
@@ -391,7 +391,7 @@ void loop()
             }
         }
 
-        if (str.startsWith("100"))
+        if (serialInput.startsWith("100"))
         {
             for (int i = 1; i <= 17; i++)
             {
