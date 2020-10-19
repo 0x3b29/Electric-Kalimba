@@ -1,5 +1,7 @@
 #include <Adafruit_PWMServoDriver.h>
+#include <LiquidCrystal.h>
 #include "MyEvent.h"
+#include <Encoder.h>
 
 Adafruit_PWMServoDriver leftServoBoard = Adafruit_PWMServoDriver(0x40);    //Create an object of board 1
 Adafruit_PWMServoDriver rightServoBoard = Adafruit_PWMServoDriver(0x41);    //Create an object of board 2 
@@ -27,6 +29,15 @@ String notesString;
 
 MyEvent* headNode;
 MyEvent* nodeToDelete;
+
+// Prepare the encoder
+const int PinSW = 4;
+long oldEncoderValue = -123456;
+bool oldPressedState = false;
+Encoder encoder(2, 3);
+
+// Prepare the LCD
+LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
 
 void addEvent(MyEvent* newEvent)
 {
@@ -284,12 +295,58 @@ void setup()
     leftServoBoard.setPWMFreq(servoFrequency);          
     rightServoBoard.setPWMFreq(servoFrequency);
 
+    // Define the switch on the rotary encoder
+    pinMode(PinSW,INPUT);
+    digitalWrite(PinSW, HIGH);
+
+    // Initialize lcd with size
+    lcd.begin(16, 2);
+
+    // Move all servos to defined positions
     Serial.println("Initialize Up");
+    lcd.print("Initialize Up");
     up();
+}
+
+void clearLCDLine(int line)
+{               
+    lcd.setCursor(0, line);
+
+    for(int n = 0; n < 16; n++) 
+    {
+        lcd.print(" ");
+    }
 }
 
 void loop()
 {
+    // Check if rotary encoder got turned
+    long encoderValue = encoder.read();
+
+    if (encoderValue != oldEncoderValue)
+    {
+        Serial.println(encoder.read());
+        oldEncoderValue = encoderValue;
+
+        clearLCDLine(1);
+        lcd.setCursor(0, 1);
+        lcd.println(encoderValue);
+    }
+
+    // Check if rotary encoder got pressed
+    if (oldPressedState != digitalRead(PinSW)) 
+    {
+        Serial.println("Pressed");
+        
+        encoderValue = 0;
+        clearLCDLine(1);
+        lcd.setCursor(0, 1);
+        lcd.println(encoderValue);
+
+        oldPressedState = digitalRead(PinSW);
+    }
+
+    // Process event queue
     while (headNode != NULL && headNode->getWhen() < millis())
     {
         // Serial.print(headNode->getWhen());
@@ -302,6 +359,7 @@ void loop()
         nodeToDelete = NULL;
     }
 
+    // Process serial input 
     if (Serial.available() > 0)
     {    
         serialInput = Serial.readString();
