@@ -1,6 +1,7 @@
 #include <Adafruit_PWMServoDriver.h>
 #include <LiquidCrystal.h>
 #include "MyEvent.h"
+#include "MyMenu.h"
 #include <Encoder.h>
 
 Adafruit_PWMServoDriver leftServoBoard = Adafruit_PWMServoDriver(0x40);    //Create an object of board 1
@@ -27,17 +28,30 @@ bool rightServosUp[8];
 String serialInput;
 String notesString;
 
+String selectedPrefix = "> ";
+String emptyPrefix = "  ";
 MyEvent* headNode;
 MyEvent* nodeToDelete;
+
+MyMenu* currentMenu;  
 
 // Prepare the encoder
 const int PinSW = 4;
 long oldEncoderValue = -123456;
-bool oldPressedState = false;
+bool encoderButtonState = true;
 Encoder encoder(2, 3);
 
 // Prepare the LCD
 LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
+
+    MyMenu * item1 = new MyMenu("Level 1 Go L2","GoTo,L2");
+    MyMenu * item2 = new MyMenu("Level 1 Do X","Print,X");
+    MyMenu * item3 = new MyMenu("Level 1 Do Y","Print,Y");
+    MyMenu * item4 = new MyMenu("Level 1 Do Z","Print,Z");
+
+    MyMenu * item5 = new MyMenu("Level 2 Do 1","Print,1");
+    MyMenu * item6 = new MyMenu("Level 2 Do 2","Print,2");
+    MyMenu * item7 = new MyMenu("Level 2 Go L1","GoTo,L1");
 
 void addEvent(MyEvent* newEvent)
 {
@@ -117,6 +131,38 @@ void parseEvent(String what)
     if (what.startsWith("process"))
     {
         processNotesString();
+    }
+
+    if (what.startsWith("GoTo"))
+    {
+        int comma1Index = what.indexOf(',');
+
+        String command = what.substring(0, comma1Index);
+        String firstArg = what.substring(comma1Index + 1, what.length());
+
+        if (firstArg.equals("L1"))
+        {
+            currentMenu = item1;
+        }
+
+        if (firstArg.equals("L2"))
+        {
+            currentMenu = item5;
+        }
+
+        String selectedLine = selectedPrefix;
+        selectedLine.concat(currentMenu->caption);
+
+        String otherLine = emptyPrefix;
+        otherLine.concat(currentMenu->bottomNeighbour->caption);
+
+        clearLCDLine(0);
+        clearLCDLine(1);
+
+        lcd.setCursor(0, 0);
+        lcd.print(selectedLine);
+        lcd.setCursor(0, 1);
+        lcd.print(otherLine);
     }
 }
 
@@ -279,6 +325,16 @@ void processNotesString()
     }
 }
 
+void clearLCDLine(int line)
+{               
+    lcd.setCursor(0, line);
+
+    for(int n = 0; n < 16; n++) 
+    {
+        lcd.print(" ");
+    }
+}
+
 void setup() 
 {
     Serial.begin(115200);
@@ -302,21 +358,51 @@ void setup()
     // Initialize lcd with size
     lcd.begin(16, 2);
 
+    clearLCDLine(0);
+    clearLCDLine(1);
+
     // Move all servos to defined positions
     Serial.println("Initialize Up");
-    lcd.print("Initialize Up");
+    // lcd.print("Initialize Up");
     up();
 }
 
-void clearLCDLine(int line)
-{               
-    lcd.setCursor(0, line);
+    item1->topNeighbour = item4;
+    item1->bottomNeighbour = item2;
 
-    for(int n = 0; n < 16; n++) 
-    {
-        lcd.print(" ");
-    }
+    item2->topNeighbour = item1;
+    item2->bottomNeighbour = item3;
+
+    item3->topNeighbour = item2;
+    item3->bottomNeighbour = item4;
+
+    item4->topNeighbour = item3;
+    item4->bottomNeighbour = item1;
+
+    item5->topNeighbour = item7;
+    item5->bottomNeighbour = item6;
+
+    item6->topNeighbour = item5;
+    item6->bottomNeighbour = item7;
+
+    item7->topNeighbour = item6;
+    item7->bottomNeighbour = item5;
+
+    currentMenu = item1;
+
+    String selectedLine = selectedPrefix;
+    selectedLine.concat(currentMenu->caption);
+
+    String otherLine = emptyPrefix;
+    otherLine.concat(currentMenu->bottomNeighbour->caption);
+
+    lcd.setCursor(0, 0);
+    lcd.print(selectedLine);
+    lcd.setCursor(0, 1);
+    lcd.print(otherLine);
 }
+
+int oldEncoderDiv4Value = 0;
 
 void loop()
 {
@@ -325,25 +411,84 @@ void loop()
 
     if (encoderValue != oldEncoderValue)
     {
-        Serial.println(encoder.read());
         oldEncoderValue = encoderValue;
 
+        int newEncoderDiv4Value = encoderValue / 4;
+
+        if (newEncoderDiv4Value != oldEncoderDiv4Value)
+        {
+            Serial.print("New Value: ");
+            Serial.println(newEncoderDiv4Value);
+
+            bool directionUp;
+
+            if (newEncoderDiv4Value > oldEncoderDiv4Value)
+            {
+                Serial.println("Up we go");
+                directionUp = true;
+
+                currentMenu = currentMenu->topNeighbour;
+            }
+            else
+            {
+                Serial.println("Down we go");
+                directionUp = false;
+
+                currentMenu = currentMenu->bottomNeighbour;
+            }
+            
+            clearLCDLine(0);
         clearLCDLine(1);
+
+            String selectedLine = selectedPrefix;
+            selectedLine.concat(currentMenu->caption);
+
+/*
+            String otherLine = emptyPrefix;
+            otherLine.concat(currentMenu->bottomNeighbour->caption);
+*/
+            if (directionUp)
+            {
+                String otherLine = emptyPrefix;
+                otherLine.concat(currentMenu->bottomNeighbour->caption);
+
+                lcd.setCursor(0, 0);
+                lcd.print(selectedLine);
+                lcd.setCursor(0, 1);
+                lcd.print(otherLine);
+            }
+            else
+            {
+                String otherLine = emptyPrefix;
+                otherLine.concat(currentMenu->topNeighbour->caption);
+
+                lcd.setCursor(0, 0);
+                lcd.print(otherLine);
         lcd.setCursor(0, 1);
-        lcd.println(encoderValue);
+                lcd.print(selectedLine);
+            }
+
+            oldEncoderDiv4Value = newEncoderDiv4Value;
+        }
     }
 
     // Check if rotary encoder got pressed
-    if (oldPressedState != digitalRead(PinSW)) 
+    if (encoderButtonState != digitalRead(PinSW)) 
+    {
+        encoderButtonState = digitalRead(PinSW);
+
+        if (encoderButtonState == true)
+        {
+            Serial.println("Relaxed");
+        }
+        else
     {
         Serial.println("Pressed");
         
-        encoderValue = 0;
-        clearLCDLine(1);
-        lcd.setCursor(0, 1);
-        lcd.println(encoderValue);
+            Serial.println(currentMenu->what);
 
-        oldPressedState = digitalRead(PinSW);
+            parseEvent(currentMenu->what);
+        }
     }
 
     // Process event queue
