@@ -422,6 +422,7 @@ void setup()
 }
 
 int oldEncoderDiv4Value = 0;
+long lastEncoderDiv4ButtonPressedValue = 0;
 
 void loop()
 {
@@ -492,17 +493,19 @@ void loop()
     }
 
     // Check if rotary encoder got pressed
-    if (encoderButtonState != digitalRead(PinSW)) 
+    // Also check if encoder state has changed which is important for selecting multiple things in a row (e.g. different notes)
+    if (encoderButtonState != digitalRead(PinSW) || newEncoderDiv4Value != lastEncoderDiv4ButtonPressedValue) 
     {
+        lastEncoderDiv4ButtonPressedValue = newEncoderDiv4Value;
         encoderButtonState = digitalRead(PinSW);
 
         if (encoderButtonState == true)
         {
-            Serial.println("Relaxed");
+             Serial.println("Button Relaxed");
         }
         else
     {
-        Serial.println("Pressed");
+             Serial.println("Button Pressed");
         
             Serial.println(currentMenu->what);
 
