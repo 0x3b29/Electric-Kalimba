@@ -44,14 +44,28 @@ Encoder encoder(2, 3);
 // Prepare the LCD
 LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
 
-    MyMenu * item1 = new MyMenu("Level 1 Go L2","GoTo,L2");
-    MyMenu * item2 = new MyMenu("Level 1 Do X","Print,X");
-    MyMenu * item3 = new MyMenu("Level 1 Do Y","Print,Y");
-    MyMenu * item4 = new MyMenu("Level 1 Do Z","Print,Z");
+MyMenu * mainMenu1 = new MyMenu("Play Notes","SetMenu,NotesMenu1");
+MyMenu * mainMenu2 = new MyMenu("Play Songs","SetMenu,SongMenu1");
+MyMenu * item3 = new MyMenu("Init All Up","Init,Up");
+MyMenu * item4 = new MyMenu("Init All Down","Init,Down");
 
-    MyMenu * item5 = new MyMenu("Level 2 Do 1","Print,1");
-    MyMenu * item6 = new MyMenu("Level 2 Do 2","Print,2");
-    MyMenu * item7 = new MyMenu("Level 2 Go L1","GoTo,L1");
+MyMenu * notesMenu1 = new MyMenu("Play Note 1","Play,1");
+MyMenu * notesMenu2 = new MyMenu("Play Note 2","Play,2");
+MyMenu * notesMenu3 = new MyMenu("Play Note 3","Play,3");
+MyMenu * notesMenu4 = new MyMenu("Play Note 4","Play,4");
+MyMenu * notesMenu5 = new MyMenu("Play Note 5","Play,5");
+MyMenu * notesMenu6 = new MyMenu("Play Note 6","Play,6");
+MyMenu * notesMenu7 = new MyMenu("Play Note 7","Play,7");
+MyMenu * notesMenu8 = new MyMenu("Play Note 8","Play,8");
+MyMenu * notesMenu9 = new MyMenu("Play Note 9","Play,9");
+MyMenu * notesMenu10 = new MyMenu("Play Note 10","Play,10");
+MyMenu * notesMenu11 = new MyMenu("Play Note 11","Play,11");
+MyMenu * notesMenu12 = new MyMenu("Play Note 12","Play,12");
+MyMenu * notesMenu13 = new MyMenu("Play Note 13","Play,13");
+MyMenu * notesMenu14 = new MyMenu("Play Note 14","Play,14");
+MyMenu * notesMenu15 = new MyMenu("Play Note 15","Play,15");
+MyMenu * notesMenu16 = new MyMenu("Play Note 16","Play,16");
+MyMenu * notesMenu17 = new MyMenu("Play Note 17","Play,17");
 
 void addEvent(MyEvent* newEvent)
 {
@@ -133,21 +147,16 @@ void parseEvent(String what)
         processNotesString();
     }
 
-    if (what.startsWith("GoTo"))
+    if (what.startsWith("SetMenu"))
     {
         int comma1Index = what.indexOf(',');
 
         String command = what.substring(0, comma1Index);
         String firstArg = what.substring(comma1Index + 1, what.length());
 
-        if (firstArg.equals("L1"))
+        if (firstArg.equals("NotesMenu1"))
         {
-            currentMenu = item1;
-        }
-
-        if (firstArg.equals("L2"))
-        {
-            currentMenu = item5;
+            currentMenu = notesMenu1;
         }
 
         String selectedLine = selectedPrefix;
@@ -367,28 +376,38 @@ void setup()
     up();
 }
 
-    item1->topNeighbour = item4;
-    item1->bottomNeighbour = item2;
+    mainMenu1->topNeighbour = item4;
+    mainMenu1->bottomNeighbour = mainMenu2;
 
-    item2->topNeighbour = item1;
-    item2->bottomNeighbour = item3;
+    mainMenu2->topNeighbour = mainMenu1;
+    mainMenu2->bottomNeighbour = item3;
 
-    item3->topNeighbour = item2;
+    item3->topNeighbour = mainMenu2;
     item3->bottomNeighbour = item4;
 
     item4->topNeighbour = item3;
-    item4->bottomNeighbour = item1;
+    item4->bottomNeighbour = mainMenu1;
 
-    item5->topNeighbour = item7;
-    item5->bottomNeighbour = item6;
+    // Define the notes menue. Could have been solved in a loop for sure
+    notesMenu1->topNeighbour = notesMenu17; notesMenu1->bottomNeighbour = notesMenu2;
+    notesMenu2->topNeighbour = notesMenu1; notesMenu2->bottomNeighbour = notesMenu3;
+    notesMenu3->topNeighbour = notesMenu2; notesMenu3->bottomNeighbour = notesMenu4;
+    notesMenu4->topNeighbour = notesMenu3; notesMenu4->bottomNeighbour = notesMenu5;
+    notesMenu5->topNeighbour = notesMenu4; notesMenu5->bottomNeighbour = notesMenu6;
+    notesMenu6->topNeighbour = notesMenu5; notesMenu6->bottomNeighbour = notesMenu7;
+    notesMenu7->topNeighbour = notesMenu6; notesMenu7->bottomNeighbour = notesMenu8;
+    notesMenu8->topNeighbour = notesMenu7; notesMenu8->bottomNeighbour = notesMenu9;
+    notesMenu9->topNeighbour = notesMenu8; notesMenu9->bottomNeighbour = notesMenu10;
+    notesMenu10->topNeighbour = notesMenu9; notesMenu10->bottomNeighbour = notesMenu11;
+    notesMenu11->topNeighbour = notesMenu10; notesMenu11->bottomNeighbour = notesMenu12;
+    notesMenu12->topNeighbour = notesMenu11; notesMenu12->bottomNeighbour = notesMenu13;
+    notesMenu13->topNeighbour = notesMenu12; notesMenu13->bottomNeighbour = notesMenu14;
+    notesMenu14->topNeighbour = notesMenu13; notesMenu14->bottomNeighbour = notesMenu15;
+    notesMenu15->topNeighbour = notesMenu14; notesMenu15->bottomNeighbour = notesMenu16;
+    notesMenu16->topNeighbour = notesMenu15; notesMenu16->bottomNeighbour = notesMenu17;
+    notesMenu17->topNeighbour = notesMenu16; notesMenu17->bottomNeighbour = notesMenu1;
 
-    item6->topNeighbour = item5;
-    item6->bottomNeighbour = item7;
-
-    item7->topNeighbour = item6;
-    item7->bottomNeighbour = item5;
-
-    currentMenu = item1;
+    currentMenu = mainMenu1;
 
     String selectedLine = selectedPrefix;
     selectedLine.concat(currentMenu->caption);
