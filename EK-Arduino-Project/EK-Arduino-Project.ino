@@ -601,9 +601,9 @@ void loop()
         {
             for (int i = 1; i <= 17; i++)
             {
-                playNote(i);
-                Serial.println(i);
-                delay(100);
+                String what = "Play,";
+                what.concat(i);
+                addEvent(new MyEvent(millis() + (i * 100), what));   
             }
         }
     }
