@@ -195,53 +195,81 @@ void setServoPosition(int board, int servo, int position)
     }
 }
 
+void moveServoDown(int board, int servo)
+{
+    int servoDownPosition = 0;
+    int servoRelaxAmountToAdd = 0;
+
+    if (board == 1)
+    {
+        servoDownPosition = leftServosDownPositions[servo];
+        servoRelaxAmountToAdd = servoRelaxAmount;
+        leftServosUp[servo] = false;
+    }
+    else
+        {
+        servoDownPosition = rightServosDownPositions[servo];
+        servoRelaxAmountToAdd = -servoRelaxAmount;
+        rightServosUp[servo] = false;
+    }
+
+    setServoPosition(board, servo, map(servoDownPosition, 0, 180, servoMin, servoMax));
+
+            addEvent(new MyEvent(millis() + servoTravelTime, "relax, " + 
+                    String(board) + ", " + 
+                    String(servo) + ", " + 
+            String(map(servoDownPosition + servoRelaxAmountToAdd, 0, 180, servoMin, servoMax)))); 
+        }
+
+void moveServoUp(int board, int servo)
+{
+    int servoUpPosition = 0;
+    int servoRelaxAmountToAdd = 0;
+
+    if (board == 1)
+    {
+        servoUpPosition = leftServosUpPositions[servo];
+        servoRelaxAmountToAdd = -servoRelaxAmount;
+        leftServosUp[servo] = true;
+    }
+        else
+        {
+        servoUpPosition = rightServosUpPositions[servo];
+        servoRelaxAmountToAdd = +servoRelaxAmount;
+        rightServosUp[servo] = true;
+    }
+
+    setServoPosition(board, servo, map(servoUpPosition, 0, 180, servoMin, servoMax));
+
+            addEvent(new MyEvent(millis() + servoTravelTime, "relax, " + 
+                    String(board) + ", " + 
+                    String(servo) + ", " + 
+            String(map(servoUpPosition + servoRelaxAmountToAdd, 0, 180, servoMin, servoMax)))); 
+        }
+
 void toogleServo(int board, int servo)
 {
     if (board == 1)
     {
         if (leftServosUp[servo] == true)
         {
-            setServoPosition(board, servo, map(leftServosDownPositions[servo], 0, 180, servoMin, servoMax));
-
-            addEvent(new MyEvent(millis() + servoTravelTime, "relax, " + 
-                    String(board) + ", " + 
-                    String(servo) + ", " + 
-                    String(map(leftServosDownPositions[servo] + servoRelaxAmount, 0, 180, servoMin, servoMax))));   
+            moveServoDown(board, servo);
         }
         else
         {
-            leftServoBoard.setPWM(servo, 0, map(leftServosUpPositions[servo], 0, 180, servoMin, servoMax));
-
-            addEvent(new MyEvent(millis() + servoTravelTime, "relax, " + 
-                    String(board) + ", " + 
-                    String(servo) + ", " + 
-                    String(map(leftServosUpPositions[servo] - servoRelaxAmount, 0, 180, servoMin, servoMax))));   
+            moveServoUp(board, servo);
         }
-
-        leftServosUp[servo] = !leftServosUp[servo];
     }
     else
     {
         if (rightServosUp[servo] == true)
         {
-            setServoPosition(board, servo, map(rightServosDownPositions[servo], 0, 180, servoMin, servoMax));
-
-            addEvent(new MyEvent(millis() + servoTravelTime, "relax, " + 
-                    String(board) + ", " + 
-                    String(servo) + ", " + 
-                    String(map(rightServosDownPositions[servo] - servoRelaxAmount, 0, 180, servoMin, servoMax))));   
+            moveServoDown(board, servo);
         }
         else
         {
-            rightServoBoard.setPWM(servo, 0, map(rightServosUpPositions[servo], 0, 180, servoMin, servoMax));
-
-            addEvent(new MyEvent(millis() + servoTravelTime, "relax, " + 
-                    String(board) + ", " + 
-                    String(servo) + ", " + 
-                    String(map(rightServosUpPositions[servo] + servoRelaxAmount, 0, 180, servoMin, servoMax))));   
+            moveServoUp(board, servo);
         }
-
-        rightServosUp[servo] = !rightServosUp[servo];
     }
 }
 
