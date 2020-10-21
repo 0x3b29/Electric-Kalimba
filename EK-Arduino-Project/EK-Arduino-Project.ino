@@ -444,14 +444,14 @@ void loop()
 
             if (newEncoderDiv4Value > oldEncoderDiv4Value)
             {
-                Serial.println("Up we go");
+                Serial.println("Scroll up");
                 directionUp = true;
 
                 currentMenu = currentMenu->topNeighbour;
             }
             else
             {
-                Serial.println("Down we go");
+                Serial.println("Scroll down");
                 directionUp = false;
 
                 currentMenu = currentMenu->bottomNeighbour;
@@ -463,10 +463,6 @@ void loop()
             String selectedLine = selectedPrefix;
             selectedLine.concat(currentMenu->caption);
 
-/*
-            String otherLine = emptyPrefix;
-            otherLine.concat(currentMenu->bottomNeighbour->caption);
-*/
             if (directionUp)
             {
                 String otherLine = emptyPrefix;
