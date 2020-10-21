@@ -173,6 +173,14 @@ void parseEvent(String what)
         lcd.setCursor(0, 1);
         lcd.print(otherLine);
     }
+
+    if (what.startsWith("Play"))
+    {
+        int comma1Index = what.indexOf(',');
+        String firstArg = what.substring(comma1Index + 1, what.length());
+
+        playNote(firstArg.toInt());
+}
 }
 
 void setServoPosition(int board, int servo, int position)
