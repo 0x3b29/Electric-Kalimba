@@ -247,7 +247,7 @@ void moveServoUp(int board, int servo)
             String(map(servoUpPosition + servoRelaxAmountToAdd, 0, 180, servoMin, servoMax)))); 
         }
 
-void toogleServo(int board, int servo)
+void toggleServo(int board, int servo)
 {
     if (board == 1)
     {
@@ -278,71 +278,71 @@ void playNote (int note)
   switch(note)
   {
     case 1:
-    toogleServo(1, 8);
+    toggleServo(1, 8);
     break;
     
     case 2:
-    toogleServo(1, 7);
+    toggleServo(1, 7);
     break;
         
     case 3:
-    toogleServo(2, 0);
+    toggleServo(2, 0);
     break;
 
     case 4:
-    toogleServo(1, 6);
+    toggleServo(1, 6);
     break;
 
     case 5:
-    toogleServo(2, 1);
+    toggleServo(2, 1);
     break;
 
     case 6:
-    toogleServo(1, 5);
+    toggleServo(1, 5);
     break;
     
     case 7:
-    toogleServo(2, 2);
+    toggleServo(2, 2);
     break;
 
     case 8:
-    toogleServo(1, 4);
+    toggleServo(1, 4);
     break;
 
     case 9:
-    toogleServo(2, 3);
+    toggleServo(2, 3);
     break;
 
     case 10:
-    toogleServo(1, 3);
+    toggleServo(1, 3);
     break;
 
     case 11:
-    toogleServo(2, 4);
+    toggleServo(2, 4);
     break;
     
     case 12:
-    toogleServo(1, 2);
+    toggleServo(1, 2);
     break;
 
     case 13:
-    toogleServo(2, 5);
+    toggleServo(2, 5);
     break;
 
     case 14:
-    toogleServo(1, 1);
+    toggleServo(1, 1);
     break;
 
     case 15:
-    toogleServo(2, 6);
+    toggleServo(2, 6);
     break;
 
     case 16:
-    toogleServo(1, 0);
+    toggleServo(1, 0);
     break;
     
     case 17:
-    toogleServo(2, 7);
+    toggleServo(2, 7);
     break;
   }
 }
