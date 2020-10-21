@@ -626,14 +626,12 @@ void up()
 {
     for (int i = 0; i <= 8; i++)
     {
-        leftServoBoard.setPWM(i, 0, map(leftServosUpPositions[i], 0, 180, servoMin, servoMax));
-        leftServosUp[i] = true;
+        moveServoUp(1, i);
     }
 
     for (int i = 0; i <= 7; i++)
     {
-        rightServoBoard.setPWM(i, 0, map(rightServosUpPositions[i], 0, 180, servoMin, servoMax));
-        rightServosUp[i] = true;
+        moveServoUp(2, i);
     }
 }
 
@@ -641,13 +639,11 @@ void down()
 {
   for (int i = 0; i <= 8; i++)
   {
-    leftServoBoard.setPWM(i, 0, map(leftServosDownPositions[i], 0, 180, servoMin, servoMax));
-    leftServosUp[i] = false;
+        moveServoDown(1, i);
   }
   
   for (int i = 0; i <= 7; i++)
   {
-    rightServoBoard.setPWM(i, 0, map(rightServosDownPositions[i], 0, 180, servoMin, servoMax));
-    rightServosUp[i] = false;
+        moveServoDown(2, i);
   }
 }
