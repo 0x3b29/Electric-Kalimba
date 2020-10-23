@@ -49,23 +49,7 @@ MyMenu * mainMenu2 = new MyMenu("Play Songs","SetMenu,SongMenu1");
 MyMenu * item3 = new MyMenu("Init All Up","Init,Up");
 MyMenu * item4 = new MyMenu("Init All Down","Init,Down");
 
-MyMenu * notesMenu1 = new MyMenu("Play Note 1","Play,1");
-MyMenu * notesMenu2 = new MyMenu("Play Note 2","Play,2");
-MyMenu * notesMenu3 = new MyMenu("Play Note 3","Play,3");
-MyMenu * notesMenu4 = new MyMenu("Play Note 4","Play,4");
-MyMenu * notesMenu5 = new MyMenu("Play Note 5","Play,5");
-MyMenu * notesMenu6 = new MyMenu("Play Note 6","Play,6");
-MyMenu * notesMenu7 = new MyMenu("Play Note 7","Play,7");
-MyMenu * notesMenu8 = new MyMenu("Play Note 8","Play,8");
-MyMenu * notesMenu9 = new MyMenu("Play Note 9","Play,9");
-MyMenu * notesMenu10 = new MyMenu("Play Note 10","Play,10");
-MyMenu * notesMenu11 = new MyMenu("Play Note 11","Play,11");
-MyMenu * notesMenu12 = new MyMenu("Play Note 12","Play,12");
-MyMenu * notesMenu13 = new MyMenu("Play Note 13","Play,13");
-MyMenu * notesMenu14 = new MyMenu("Play Note 14","Play,14");
-MyMenu * notesMenu15 = new MyMenu("Play Note 15","Play,15");
-MyMenu * notesMenu16 = new MyMenu("Play Note 16","Play,16");
-MyMenu * notesMenu17 = new MyMenu("Play Note 17","Play,17");
+MyMenu * notesMenu[17];
 
 void addEvent(MyEvent* newEvent)
 {
@@ -156,7 +140,7 @@ void parseEvent(String what)
 
         if (firstArg.equals("NotesMenu1"))
         {
-            currentMenu = notesMenu1;
+            currentMenu = notesMenu[0];
         }
 
         String selectedLine = selectedPrefix;
@@ -424,25 +408,31 @@ void setup()
     item4->topNeighbour = item3;
     item4->bottomNeighbour = mainMenu1;
 
-    // Define the notes menue. Could have been solved in a loop for sure
-    notesMenu1->topNeighbour = notesMenu17; notesMenu1->bottomNeighbour = notesMenu2;
-    notesMenu2->topNeighbour = notesMenu1; notesMenu2->bottomNeighbour = notesMenu3;
-    notesMenu3->topNeighbour = notesMenu2; notesMenu3->bottomNeighbour = notesMenu4;
-    notesMenu4->topNeighbour = notesMenu3; notesMenu4->bottomNeighbour = notesMenu5;
-    notesMenu5->topNeighbour = notesMenu4; notesMenu5->bottomNeighbour = notesMenu6;
-    notesMenu6->topNeighbour = notesMenu5; notesMenu6->bottomNeighbour = notesMenu7;
-    notesMenu7->topNeighbour = notesMenu6; notesMenu7->bottomNeighbour = notesMenu8;
-    notesMenu8->topNeighbour = notesMenu7; notesMenu8->bottomNeighbour = notesMenu9;
-    notesMenu9->topNeighbour = notesMenu8; notesMenu9->bottomNeighbour = notesMenu10;
-    notesMenu10->topNeighbour = notesMenu9; notesMenu10->bottomNeighbour = notesMenu11;
-    notesMenu11->topNeighbour = notesMenu10; notesMenu11->bottomNeighbour = notesMenu12;
-    notesMenu12->topNeighbour = notesMenu11; notesMenu12->bottomNeighbour = notesMenu13;
-    notesMenu13->topNeighbour = notesMenu12; notesMenu13->bottomNeighbour = notesMenu14;
-    notesMenu14->topNeighbour = notesMenu13; notesMenu14->bottomNeighbour = notesMenu15;
-    notesMenu15->topNeighbour = notesMenu14; notesMenu15->bottomNeighbour = notesMenu16;
-    notesMenu16->topNeighbour = notesMenu15; notesMenu16->bottomNeighbour = notesMenu17;
-    notesMenu17->topNeighbour = notesMenu16; notesMenu17->bottomNeighbour = notesMenu1;
+    // Create all the entries for the notes Menu
+    for (int i = 0; i < 17; i++)
+    {
+        String label = "Play Note ";
+        label.concat(String(i + 1));
+        String command = "Play,";
+        command.concat(String(i + 1));
+        notesMenu[i] = new MyMenu(label, command);
+    }
 
+    // Link all the inner notes menu items togeather
+    for (int i = 1; i < 16; i++)
+    {
+        notesMenu[i]->topNeighbour = notesMenu[i - 1];
+        notesMenu[i]->bottomNeighbour = notesMenu[i + 1];
+    }
+
+    // Link all the extreme notes menu items togeather
+    notesMenu[0]->topNeighbour = notesMenu[16];
+    notesMenu[0]->bottomNeighbour = notesMenu[1];
+
+    notesMenu[16]->topNeighbour = notesMenu[15];
+    notesMenu[16]->bottomNeighbour = notesMenu[0];
+
+    // Set entry node of Menu
     currentMenu = mainMenu1;
 
     // Output Menu 
