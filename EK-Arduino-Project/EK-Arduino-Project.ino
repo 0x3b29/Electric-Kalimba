@@ -445,16 +445,49 @@ void setup()
 
     currentMenu = mainMenu1;
 
-    String selectedLine = selectedPrefix;
-    selectedLine.concat(currentMenu->caption);
+    // Output Menu 
+    printToLCD(currentMenu->caption, currentMenu->bottomNeighbour->caption, 0);
+}
 
-    String otherLine = emptyPrefix;
-    otherLine.concat(currentMenu->bottomNeighbour->caption);
+void printToLCD(String firstLine, String secondLine, int selectedLine)
+{
+    String upperLine;
+    String lowerLine;
 
+    if (selectedLine == 0)
+    {
+        upperLine = selectedPrefix;
+        upperLine.concat(firstLine);
+
+        lowerLine = emptyPrefix;
+        lowerLine.concat(secondLine);
+    }
+    else if (selectedLine == 1)
+    {
+        upperLine = emptyPrefix;
+        upperLine.concat(firstLine);
+
+        lowerLine = selectedPrefix;
+        lowerLine.concat(secondLine);
+    }
+    else
+    {
+        upperLine = emptyPrefix;
+        upperLine.concat(firstLine);
+
+        lowerLine = emptyPrefix;
+        lowerLine.concat(secondLine);
+    }
+
+    // Clear LCD
+    clearLCDLine(0);
+    clearLCDLine(1);
+
+    // Print lines to lcd
     lcd.setCursor(0, 0);
-    lcd.print(selectedLine);
+    lcd.print(upperLine);
     lcd.setCursor(0, 1);
-    lcd.print(otherLine);
+    lcd.print(lowerLine);
 }
 
 int oldEncoderDiv4Value = 0;
@@ -464,12 +497,11 @@ void loop()
 {
     // Check if rotary encoder got turned
     long encoderValue = encoder.read();
+    int newEncoderDiv4Value = encoderValue / 4;
 
     if (encoderValue != oldEncoderValue)
     {
         oldEncoderValue = encoderValue;
-
-        int newEncoderDiv4Value = encoderValue / 4;
 
         if (newEncoderDiv4Value != oldEncoderDiv4Value)
         {
@@ -481,43 +513,25 @@ void loop()
             if (newEncoderDiv4Value > oldEncoderDiv4Value)
             {
                 Serial.println("Scroll up");
-                directionUp = true;
 
+                directionUp = true;
                 currentMenu = currentMenu->topNeighbour;
             }
             else
             {
                 Serial.println("Scroll down");
-                directionUp = false;
 
+                directionUp = false;
                 currentMenu = currentMenu->bottomNeighbour;
             }
             
-            clearLCDLine(0);
-        clearLCDLine(1);
-
-            String selectedLine = selectedPrefix;
-            selectedLine.concat(currentMenu->caption);
-
             if (directionUp)
             {
-                String otherLine = emptyPrefix;
-                otherLine.concat(currentMenu->bottomNeighbour->caption);
-
-                lcd.setCursor(0, 0);
-                lcd.print(selectedLine);
-                lcd.setCursor(0, 1);
-                lcd.print(otherLine);
+                printToLCD(currentMenu->caption, currentMenu->bottomNeighbour->caption, 0);
             }
             else
             {
-                String otherLine = emptyPrefix;
-                otherLine.concat(currentMenu->topNeighbour->caption);
-
-                lcd.setCursor(0, 0);
-                lcd.print(otherLine);
-        lcd.setCursor(0, 1);
-                lcd.print(selectedLine);
+                printToLCD(currentMenu->topNeighbour->caption, currentMenu->caption, 1);
             }
 
             oldEncoderDiv4Value = newEncoderDiv4Value;
