@@ -248,7 +248,7 @@ void moveServoDown(int board, int servo)
         leftServosUp[servo] = false;
     }
     else
-        {
+    {
         servoDownPosition = rightServosDownPositions[servo];
         servoRelaxAmountToAdd = -servoRelaxAmount;
         rightServosUp[servo] = false;
@@ -256,11 +256,11 @@ void moveServoDown(int board, int servo)
 
     setServoPosition(board, servo, map(servoDownPosition, 0, 180, servoMin, servoMax));
 
-            addEvent(new MyEvent(millis() + servoTravelTime, "relax, " + 
-                    String(board) + ", " + 
-                    String(servo) + ", " + 
-            String(map(servoDownPosition + servoRelaxAmountToAdd, 0, 180, servoMin, servoMax)))); 
-        }
+    addEvent(new MyEvent(millis() + servoTravelTime, "relax, " + 
+            String(board) + ", " + 
+            String(servo) + ", " + 
+    String(map(servoDownPosition + servoRelaxAmountToAdd, 0, 180, servoMin, servoMax)))); 
+}
 
 void moveServoUp(int board, int servo)
 {
@@ -273,8 +273,8 @@ void moveServoUp(int board, int servo)
         servoRelaxAmountToAdd = -servoRelaxAmount;
         leftServosUp[servo] = true;
     }
-        else
-        {
+    else
+    {
         servoUpPosition = rightServosUpPositions[servo];
         servoRelaxAmountToAdd = +servoRelaxAmount;
         rightServosUp[servo] = true;
@@ -282,11 +282,11 @@ void moveServoUp(int board, int servo)
 
     setServoPosition(board, servo, map(servoUpPosition, 0, 180, servoMin, servoMax));
 
-            addEvent(new MyEvent(millis() + servoTravelTime, "relax, " + 
-                    String(board) + ", " + 
-                    String(servo) + ", " + 
-            String(map(servoUpPosition + servoRelaxAmountToAdd, 0, 180, servoMin, servoMax)))); 
-        }
+    addEvent(new MyEvent(millis() + servoTravelTime, "relax, " + 
+            String(board) + ", " + 
+            String(servo) + ", " + 
+    String(map(servoUpPosition + servoRelaxAmountToAdd, 0, 180, servoMin, servoMax)))); 
+}
 
 void toggleServo(int board, int servo)
 {
@@ -342,89 +342,89 @@ void moveAllServosUp()
 
 void moveAllServosDown()
 {
-  for (int i = 0; i <= 8; i++)
-  {
+    for (int i = 0; i <= 8; i++)
+    {
         moveServoDown(1, i);
-  }
-  
-  for (int i = 0; i <= 7; i++)
-  {
+    }
+
+    for (int i = 0; i <= 7; i++)
+    {
         moveServoDown(2, i);
-  }
+    }
 }
 
-void playNote (int note)
+void playNote(int note)
 {
-  switch(note)
-  {
-    case 1:
-    toggleServo(1, 8);
-    break;
-    
-    case 2:
-    toggleServo(1, 7);
-    break;
-        
-    case 3:
-    toggleServo(2, 0);
-    break;
+    switch(note)
+    {
+        case 1:
+        toggleServo(1, 8);
+        break;
 
-    case 4:
-    toggleServo(1, 6);
-    break;
+        case 2:
+        toggleServo(1, 7);
+        break;
+            
+        case 3:
+        toggleServo(2, 0);
+        break;
 
-    case 5:
-    toggleServo(2, 1);
-    break;
+        case 4:
+        toggleServo(1, 6);
+        break;
 
-    case 6:
-    toggleServo(1, 5);
-    break;
-    
-    case 7:
-    toggleServo(2, 2);
-    break;
+        case 5:
+        toggleServo(2, 1);
+        break;
 
-    case 8:
-    toggleServo(1, 4);
-    break;
+        case 6:
+        toggleServo(1, 5);
+        break;
 
-    case 9:
-    toggleServo(2, 3);
-    break;
+        case 7:
+        toggleServo(2, 2);
+        break;
 
-    case 10:
-    toggleServo(1, 3);
-    break;
+        case 8:
+        toggleServo(1, 4);
+        break;
 
-    case 11:
-    toggleServo(2, 4);
-    break;
-    
-    case 12:
-    toggleServo(1, 2);
-    break;
+        case 9:
+        toggleServo(2, 3);
+        break;
 
-    case 13:
-    toggleServo(2, 5);
-    break;
+        case 10:
+        toggleServo(1, 3);
+        break;
 
-    case 14:
-    toggleServo(1, 1);
-    break;
+        case 11:
+        toggleServo(2, 4);
+        break;
 
-    case 15:
-    toggleServo(2, 6);
-    break;
+        case 12:
+        toggleServo(1, 2);
+        break;
 
-    case 16:
-    toggleServo(1, 0);
-    break;
-    
-    case 17:
-    toggleServo(2, 7);
-    break;
-  }
+        case 13:
+        toggleServo(2, 5);
+        break;
+
+        case 14:
+        toggleServo(1, 1);
+        break;
+
+        case 15:
+        toggleServo(2, 6);
+        break;
+
+        case 16:
+        toggleServo(1, 0);
+        break;
+
+        case 17:
+        toggleServo(2, 7);
+        break;
+    }
 }
 
 void processNotesString()
