@@ -30,11 +30,23 @@ String notesString;
 
 String selectedPrefix = "> ";
 String emptyPrefix = "  ";
+
+short currentArrayPosition;
+short currentArraySize;
+const unsigned char * currentNotesArray;
+const unsigned short int * currentOffsetsArray;
+
+short int luxembourgAnthemSize = 146;
+const PROGMEM unsigned char luxembourgAnthemNotes[146] = {5, 12, 5, 12, 8, 15, 8, 15, 3, 10, 5, 12, 4, 11, 4, 11, 4, 11, 4, 11, 5, 12, 6, 13, 5, 12, 4, 11, 3, 10, 5, 12, 5, 12, 8, 15, 8, 15, 7, 14, 7, 14, 6, 13, 9, 16, 8, 15, 7, 14, 5, 12, 7, 14, 6, 13, 5, 12, 2, 9, 2, 9, 3, 10, 4, 11, 5, 12, 6, 13, 6, 13, 5, 12, 4, 11, 3, 10, 5, 12, 5, 12, 8, 15, 7, 14, 5, 12, 5, 12, 6, 13, 7, 14, 8, 15, 9, 16, 10, 17, 9, 16, 8, 15, 6, 13, 5, 12, 3, 10, 5, 12, 4, 11, 3, 10, 5, 12, 5, 12, 6, 13, 7, 14, 8, 15, 9, 16, 10, 17, 9, 16, 8, 15, 6, 13, 5, 12, 8, 15, 7, 14, 9, 16, 8, 15};
+const PROGMEM unsigned short int luxembourgAnthemOffsets[146] = {2, 475, 3, 848, 3, 192, 3, 522, 3, 440, 3, 468, 3, 492, 3, 807, 3, 153, 3, 455, 3, 225, 2, 250, 3, 686, 3, 257, 2, 1366, 2, 451, 3, 895, 3, 184, 3, 464, 3, 423, 3, 481, 3, 473, 3, 751, 3, 197, 2, 479, 3, 452, 3, 704, 3, 212, 3, 1476, 2, 478, 2, 700, 3, 241, 3, 543, 3, 471, 2, 417, 3, 438, 3, 822, 3, 201, 3, 467, 3, 456, 3, 488, 3, 492, 3, 1426, 2, 465, 3, 505, 3, 214, 3, 224, 3, 454, 3, 560, 3, 677, 2, 189, 3, 521, 3, 455, 3, 780, 3, 205, 3, 428, 3, 479, 3, 1498, 3, 446, 3, 540, 2, 214, 2, 245, 3, 442, 3, 505, 3, 669, 3, 189, 2, 547, 3, 497, 3, 737, 3, 228, 3, 522, 3, 490, 3, 0};
+
+const PROGMEM char ageOfEmpires[] = "6,500;9,700;11,300;10,300;9,300;10,800;6,500;9,700;11,300;10,300;9,300;12,800;6,500;9,700;11,300;10,300;9,300;10,800;10,500;10,700;11,300;10,300;8,300;9,1500;10,300;13,300;12,300;14,800;17,300;16,700;14,200;13,200;14,300;16,1000;10,300;13,300;12,300;10,500;9,400;12,600;10,1500;3,20;10,500;6,20;13,700;8,20;15,300;7,20;14,300;6,20;13,300;7,20;14,800;3,20;10,500;6,20;13,700;8,20;15,300;7,20;14,300;6,20;13,300;9,20;16,800;3,20;10,500;6,20;13,700;8,20;15,300;7,20;14,300;6,20;13,300;7,20;14,800;7,20;14,500;7,20;14,700;8,20;15,300;7,20;14,300;5,20;12,300;6,20;13,800;";
+
 MyEvent* headNode;
 MyEvent* nodeToDelete;
 
 // Create the menu items
-MyMenu* currentMenu;  
+MyMenu* currentMenu;
 
 MyMenu* mainMenu1 = new MyMenu("Play Notes","SetMenu,NotesMenu1");
 MyMenu* mainMenu2 = new MyMenu("Play Songs","SetMenu,SongMenu1");
@@ -136,6 +148,11 @@ void parseEvent(String what)
         processNotesString();
     }
 
+    if (what.startsWith("processArray"))
+    {
+        processNotesArray();
+    }
+
     if (what.startsWith("SetMenu"))
     {
         int comma1Index = what.indexOf(',');
@@ -147,14 +164,14 @@ void parseEvent(String what)
         if (firstArg.equals("NotesMenu1"))
         {
             currentMenu = notesMenu[0];
-        }
-
+        } 
+        
         // Go to song menu
         if (firstArg.equals("SongMenu1"))
         {
             currentMenu = songMenu1;
         }
-
+        
         // Go back from song menu
         if (firstArg.equals("MainMenu2"))
         {
@@ -170,7 +187,37 @@ void parseEvent(String what)
         String firstArg = what.substring(comma1Index + 1, what.length());
 
         playNote(firstArg.toInt());
-}
+    }
+
+    if (what.startsWith("Song"))
+    {
+        int comma1Index = what.indexOf(',');
+        String firstArg = what.substring(comma1Index + 1, what.length());
+
+        if (firstArg.equals("Lux"))
+        {
+            currentArrayPosition = 0;
+            currentArraySize = luxembourgAnthemSize;
+            currentNotesArray = luxembourgAnthemNotes;
+            currentOffsetsArray = luxembourgAnthemOffsets;
+
+            processNotesArray();
+        }
+
+        if (firstArg.equals("Age"))
+        {
+            char c;
+            const char * currentChar = ageOfEmpires;
+
+            while((c = pgm_read_byte(currentChar++)))
+            {
+                Serial.print(c);
+                notesString.concat(c);
+            }
+
+            processNotesString();
+        }
+    }
 }
 
 void setServoPosition(int board, int servo, int position)
@@ -356,7 +403,23 @@ void processNotesString()
     
         playNote(firstValue.toInt());
         
+        // Add an event to the queue to process the next bit of the notesStrign after some waiting period
         addEvent(new MyEvent(millis() + secondValue.toInt(), "process"));       
+    }
+}
+
+void processNotesArray()
+{
+    unsigned char currentNote = pgm_read_byte_near(&currentNotesArray[currentArrayPosition]);
+    unsigned short int currentOffset = pgm_read_word_near(&currentOffsetsArray[currentArrayPosition]);
+
+    playNote(currentNote);
+
+    currentArrayPosition++;
+
+    if (currentArrayPosition < currentArraySize)
+    {
+        addEvent(new MyEvent(millis() + currentOffset, "processArray"));    
     }
 }
 
@@ -530,7 +593,7 @@ void loop()
                 directionUp = false;
                 currentMenu = currentMenu->bottomNeighbour;
             }
-            
+
             if (directionUp)
             {
                 printToLCD(currentMenu->caption, currentMenu->bottomNeighbour->caption, 0);
@@ -553,11 +616,11 @@ void loop()
 
         if (encoderButtonState == true)
         {
-             Serial.println("Button Relaxed");
+            Serial.println("Button Relaxed");
         }
         else
-    {
-             Serial.println("Button Pressed");
+        {
+            Serial.println("Button Pressed");
         
             Serial.println(currentMenu->what);
 
