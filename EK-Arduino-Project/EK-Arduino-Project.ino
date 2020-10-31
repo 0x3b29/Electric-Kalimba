@@ -59,14 +59,18 @@ MyMenu* songMenu3 = new MyMenu("Back","SetMenu,MainMenu2");
 
 MyMenu* notesMenu[17];
 
+// Prepare the LCD
+LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
+
 // Prepare the encoder
 const int PinSW = 4;
 long oldEncoderValue = -123456;
 bool encoderButtonState = true;
 Encoder encoder(2, 3);
 
-// Prepare the LCD
-LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
+// Keep global encoder state
+int oldEncoderDiv4Value = 0;
+long lastEncoderDiv4ButtonPressedValue = 0;
 
 void addEvent(MyEvent* newEvent)
 {
@@ -310,6 +314,45 @@ void toggleServo(int board, int servo)
     }
 }
 
+void moveAllServosCenter()
+{
+    for (int i = 0; i <= 8; i++)
+    {
+        leftServoBoard.setPWM(i, 0, map(board1ServoCenterPos[i], 0, 180, servoMin, servoMax));
+    }
+
+    for (int i = 0; i <= 7; i++)
+    {
+        rightServoBoard.setPWM(i, 0, map(board2ServoCenterPos[i], 0, 180, servoMin, servoMax));
+    }
+}
+
+void moveAllServosUp()
+{
+    for (int i = 0; i <= 8; i++)
+    {
+        moveServoUp(1, i);
+    }
+
+    for (int i = 0; i <= 7; i++)
+    {
+        moveServoUp(2, i);
+    }
+}
+
+void moveAllServosDown()
+{
+  for (int i = 0; i <= 8; i++)
+  {
+        moveServoDown(1, i);
+  }
+  
+  for (int i = 0; i <= 7; i++)
+  {
+        moveServoDown(2, i);
+  }
+}
+
 void playNote (int note)
 {
   switch(note)
@@ -433,6 +476,47 @@ void clearLCDLine(int line)
     }
 }
 
+void printToLCD(String firstLine, String secondLine, int selectedLine)
+{
+    String upperLine;
+    String lowerLine;
+
+    if (selectedLine == 0)
+    {
+        upperLine = selectedPrefix;
+        upperLine.concat(firstLine);
+
+        lowerLine = emptyPrefix;
+        lowerLine.concat(secondLine);
+    }
+    else if (selectedLine == 1)
+    {
+        upperLine = emptyPrefix;
+        upperLine.concat(firstLine);
+
+        lowerLine = selectedPrefix;
+        lowerLine.concat(secondLine);
+    }
+    else
+    {
+        upperLine = emptyPrefix;
+        upperLine.concat(firstLine);
+
+        lowerLine = emptyPrefix;
+        lowerLine.concat(secondLine);
+    }
+
+    // Clear LCD
+    clearLCDLine(0);
+    clearLCDLine(1);
+
+    // Print lines to lcd
+    lcd.setCursor(0, 0);
+    lcd.print(upperLine);
+    lcd.setCursor(0, 1);
+    lcd.print(lowerLine);
+}
+
 void setup() 
 {
     Serial.begin(115200);
@@ -517,50 +601,6 @@ void setup()
     // Output menu 
     printToLCD(currentMenu->caption, currentMenu->bottomNeighbour->caption, 0);
 }
-
-void printToLCD(String firstLine, String secondLine, int selectedLine)
-{
-    String upperLine;
-    String lowerLine;
-
-    if (selectedLine == 0)
-    {
-        upperLine = selectedPrefix;
-        upperLine.concat(firstLine);
-
-        lowerLine = emptyPrefix;
-        lowerLine.concat(secondLine);
-    }
-    else if (selectedLine == 1)
-    {
-        upperLine = emptyPrefix;
-        upperLine.concat(firstLine);
-
-        lowerLine = selectedPrefix;
-        lowerLine.concat(secondLine);
-    }
-    else
-    {
-        upperLine = emptyPrefix;
-        upperLine.concat(firstLine);
-
-        lowerLine = emptyPrefix;
-        lowerLine.concat(secondLine);
-    }
-
-    // Clear LCD
-    clearLCDLine(0);
-    clearLCDLine(1);
-
-    // Print lines to lcd
-    lcd.setCursor(0, 0);
-    lcd.print(upperLine);
-    lcd.setCursor(0, 1);
-    lcd.print(lowerLine);
-}
-
-int oldEncoderDiv4Value = 0;
-long lastEncoderDiv4ButtonPressedValue = 0;
 
 void loop()
 {
@@ -690,43 +730,4 @@ void loop()
             }
         }
     }
-}
-
-void moveAllServosCenter()
-{
-    for (int i = 0; i <= 8; i++)
-    {
-        leftServoBoard.setPWM(i, 0, map(board1ServoCenterPos[i], 0, 180, servoMin, servoMax));
-    }
-
-    for (int i = 0; i <= 7; i++)
-    {
-        rightServoBoard.setPWM(i, 0, map(board2ServoCenterPos[i], 0, 180, servoMin, servoMax));
-    }
-}
-
-void moveAllServosUp()
-{
-    for (int i = 0; i <= 8; i++)
-    {
-        moveServoUp(1, i);
-    }
-
-    for (int i = 0; i <= 7; i++)
-    {
-        moveServoUp(2, i);
-    }
-}
-
-void moveAllServosDown()
-{
-  for (int i = 0; i <= 8; i++)
-  {
-        moveServoDown(1, i);
-  }
-  
-  for (int i = 0; i <= 7; i++)
-  {
-        moveServoDown(2, i);
-  }
 }
