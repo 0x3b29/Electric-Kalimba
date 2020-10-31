@@ -33,7 +33,19 @@ String emptyPrefix = "  ";
 MyEvent* headNode;
 MyEvent* nodeToDelete;
 
+// Create the menu items
 MyMenu* currentMenu;  
+
+MyMenu* mainMenu1 = new MyMenu("Play Notes","SetMenu,NotesMenu1");
+MyMenu* mainMenu2 = new MyMenu("Play Songs","SetMenu,SongMenu1");
+MyMenu* mainMenu3 = new MyMenu("Init All Up","Init,Up");
+MyMenu* mainMenu4 = new MyMenu("Init All Down","Init,Down");
+
+MyMenu* songMenu1 = new MyMenu("Age of Empires","Song,Age");
+MyMenu* songMenu2 = new MyMenu("Luxebourg Anth.","Song,Lux");
+MyMenu* songMenu3 = new MyMenu("Back","SetMenu,MainMenu2");
+
+MyMenu* notesMenu[17];
 
 // Prepare the encoder
 const int PinSW = 4;
@@ -43,13 +55,6 @@ Encoder encoder(2, 3);
 
 // Prepare the LCD
 LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
-
-MyMenu * mainMenu1 = new MyMenu("Play Notes","SetMenu,NotesMenu1");
-MyMenu * mainMenu2 = new MyMenu("Play Songs","SetMenu,SongMenu1");
-MyMenu * item3 = new MyMenu("Init All Up","Init,Up");
-MyMenu * item4 = new MyMenu("Init All Down","Init,Down");
-
-MyMenu * notesMenu[17];
 
 void addEvent(MyEvent* newEvent)
 {
@@ -138,24 +143,25 @@ void parseEvent(String what)
         String command = what.substring(0, comma1Index);
         String firstArg = what.substring(comma1Index + 1, what.length());
 
+        // Go to notes menu
         if (firstArg.equals("NotesMenu1"))
         {
             currentMenu = notesMenu[0];
         }
 
-        String selectedLine = selectedPrefix;
-        selectedLine.concat(currentMenu->caption);
+        // Go to song menu
+        if (firstArg.equals("SongMenu1"))
+        {
+            currentMenu = songMenu1;
+        }
 
-        String otherLine = emptyPrefix;
-        otherLine.concat(currentMenu->bottomNeighbour->caption);
+        // Go back from song menu
+        if (firstArg.equals("MainMenu2"))
+        {
+            currentMenu = mainMenu2;
+        }
 
-        clearLCDLine(0);
-        clearLCDLine(1);
-
-        lcd.setCursor(0, 0);
-        lcd.print(selectedLine);
-        lcd.setCursor(0, 1);
-        lcd.print(otherLine);
+        printToLCD(currentMenu->caption, currentMenu->bottomNeighbour->caption, 0);
     }
 
     if (what.startsWith("Play"))
@@ -394,19 +400,29 @@ void setup()
     Serial.println("Initialize Up");
     // lcd.print("Initialize Up");
     up();
-}
 
-    mainMenu1->topNeighbour = item4;
+    // Link the main menu items
+    mainMenu1->topNeighbour = mainMenu4;
     mainMenu1->bottomNeighbour = mainMenu2;
 
     mainMenu2->topNeighbour = mainMenu1;
-    mainMenu2->bottomNeighbour = item3;
+    mainMenu2->bottomNeighbour = mainMenu3;
 
-    item3->topNeighbour = mainMenu2;
-    item3->bottomNeighbour = item4;
+    mainMenu3->topNeighbour = mainMenu2;
+    mainMenu3->bottomNeighbour = mainMenu4;
 
-    item4->topNeighbour = item3;
-    item4->bottomNeighbour = mainMenu1;
+    mainMenu4->topNeighbour = mainMenu3;
+    mainMenu4->bottomNeighbour = mainMenu1;
+
+    // Link the song menu items
+    songMenu1->topNeighbour = songMenu3;
+    songMenu1->bottomNeighbour = songMenu2;
+
+    songMenu2->topNeighbour = songMenu1;
+    songMenu2->bottomNeighbour = songMenu3;
+
+    songMenu3->topNeighbour = songMenu2;
+    songMenu3->bottomNeighbour = songMenu1;   
 
     // Create all the entries for the notes Menu
     for (int i = 0; i < 17; i++)
@@ -432,10 +448,10 @@ void setup()
     notesMenu[16]->topNeighbour = notesMenu[15];
     notesMenu[16]->bottomNeighbour = notesMenu[0];
 
-    // Set entry node of Menu
+    // Set entry node of menu
     currentMenu = mainMenu1;
 
-    // Output Menu 
+    // Output menu 
     printToLCD(currentMenu->caption, currentMenu->bottomNeighbour->caption, 0);
 }
 
