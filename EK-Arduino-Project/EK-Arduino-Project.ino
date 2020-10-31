@@ -462,7 +462,7 @@ void setup()
     // Move all servos to defined positions
     Serial.println("Initialize Up");
     // lcd.print("Initialize Up");
-    up();
+    moveAllServosUp();
 
     // Link the main menu items
     mainMenu1->topNeighbour = mainMenu4;
@@ -650,19 +650,19 @@ void loop()
         if (serialInput.charAt(0) == 'c')
         {
             Serial.println("Centering ...");
-            center();
+            moveAllServosCenter();
         }
 
         if (serialInput.charAt(0) == 'u')
         {
             Serial.println("Upping ...");
-            up();
+            moveAllServosUp();
         }
 
         if (serialInput.charAt(0) == 'd')
         {
             Serial.println("Downing ...");
-            down();
+            moveAllServosDown();
         }
 
         if (serialInput.indexOf(',') > 0)
@@ -692,7 +692,7 @@ void loop()
     }
 }
 
-void center()
+void moveAllServosCenter()
 {
     for (int i = 0; i <= 8; i++)
     {
@@ -705,7 +705,7 @@ void center()
     }
 }
 
-void up()
+void moveAllServosUp()
 {
     for (int i = 0; i <= 8; i++)
     {
@@ -718,7 +718,7 @@ void up()
     }
 }
 
-void down()
+void moveAllServosDown()
 {
   for (int i = 0; i <= 8; i++)
   {
