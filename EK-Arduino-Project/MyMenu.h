@@ -1,13 +1,18 @@
+#include "MyEnums.h"
 class MyMenu
 {
     public: 
-    MyMenu(String caption, String what)
+    MyMenu(const char * caption, EventType what, int arg)
     {
         this->caption = caption;
         this->what = what;
+
+        args = new int [1]; 
+        args[0] = arg;
     }
-    String caption;
-    String what;
+    const char * caption;
+    EventType what;
+    int * args;
 
     MyMenu * topNeighbour;
     MyMenu * bottomNeighbour;

@@ -3,6 +3,7 @@
 #include "MyEvent.h"
 #include "MyMenu.h"
 #include <Encoder.h>
+#include "MyEnums.h"
 
 Adafruit_PWMServoDriver leftServoBoard = Adafruit_PWMServoDriver(0x40);    //Create an object of board 1
 Adafruit_PWMServoDriver rightServoBoard = Adafruit_PWMServoDriver(0x41);    //Create an object of board 2 
@@ -25,9 +26,6 @@ int rightServosUpPositions[8] = {62, 55, 64, 65, 66, 69, 71, 73};
 bool leftServosUp[9];
 bool rightServosUp[8];
 
-String serialInput;
-String notesString;
-
 String selectedPrefix = "> ";
 String emptyPrefix = "  ";
 
@@ -42,6 +40,11 @@ const PROGMEM unsigned short int luxembourgAnthemOffsets[146] = {2, 475, 3, 848,
 
 const PROGMEM char ageOfEmpires[] = "6,500;9,700;11,300;10,300;9,300;10,800;6,500;9,700;11,300;10,300;9,300;12,800;6,500;9,700;11,300;10,300;9,300;10,800;10,500;10,700;11,300;10,300;8,300;9,1500;10,300;13,300;12,300;14,800;17,300;16,700;14,200;13,200;14,300;16,1000;10,300;13,300;12,300;10,500;9,400;12,600;10,1500;3,20;10,500;6,20;13,700;8,20;15,300;7,20;14,300;6,20;13,300;7,20;14,800;3,20;10,500;6,20;13,700;8,20;15,300;7,20;14,300;6,20;13,300;9,20;16,800;3,20;10,500;6,20;13,700;8,20;15,300;7,20;14,300;6,20;13,300;7,20;14,800;7,20;14,500;7,20;14,700;8,20;15,300;7,20;14,300;5,20;12,300;6,20;13,800;";
 
+const char notesArrayText[][13] = {"Play Note 1", "Play Note 2", "Play Note 3", "Play Note 4", 
+    "Play Note 5", "Play Note 6", "Play Note 7", "Play Note 8", "Play Note 9", 
+    "Play Note 10", "Play Note 11", "Play Note 12", "Play Note 13", "Play Note 14", 
+    "Play Note 15", "Play Note 16", "Play Note 17"};
+
 int totalNotesPlayed = 0;
 unsigned long lastEventDue = 0;
 
@@ -53,14 +56,15 @@ MyEvent* nodeToDelete;
 // Create the menu items
 MyMenu* currentMenu;
 
-MyMenu* mainMenu1 = new MyMenu("Play Notes","SetMenu,NotesMenu1");
-MyMenu* mainMenu2 = new MyMenu("Play Songs","SetMenu,SongMenu1");
-MyMenu* mainMenu3 = new MyMenu("Init All Up","Init,Up");
-MyMenu* mainMenu4 = new MyMenu("Init All Down","Init,Down");
+MyMenu* mainMenu1 = new MyMenu("Play Notes", SetMenu, NotesMenu);
+MyMenu* mainMenu2 = new MyMenu("Play Songs", SetMenu, SongMenu);
+MyMenu* mainMenu3 = new MyMenu("Init All Up", Init, Up);
+MyMenu* mainMenu4 = new MyMenu("Init All Down", Init, Down);
+MyMenu* mainMenu5 = new MyMenu("Init All Center", Init, Down);
 
-MyMenu* songMenu1 = new MyMenu("Age of Empires","Song,Age");
-MyMenu* songMenu2 = new MyMenu("Luxebourg Anth.","Song,Lux");
-MyMenu* songMenu3 = new MyMenu("Back","SetMenu,MainMenu2");
+MyMenu* songMenu1 = new MyMenu("Age of Empires",PlaySong, AgeOfEmpiresTheme);
+MyMenu* songMenu2 = new MyMenu("Luxebourg Anth.",PlaySong, LuxembourgAnthem);
+MyMenu* songMenu3 = new MyMenu("Back", SetMenu, MainMenu);
 
 MyMenu* notesMenu[17];
 
@@ -145,82 +149,81 @@ int freeMemory() {
 #endif  // __arm__
 }
 
-void parseEvent(String what)
+void generateEventsFromPROGMEM(const char * startChar)
 {
-    if (what.startsWith("relax"))
+    char c;
+    const char * currentChar = startChar;
+
+    char buffer[10];
+    int bufferIndex = 0;
+
+    while((c = pgm_read_byte(currentChar++)))
     {
-        // Serial.println("Got " + what);
-
-        int comma1Index = what.indexOf(',');
-        int comma2Index = what.indexOf(',', comma1Index + 1);
-        int comma3Index = what.indexOf(',', comma2Index + 1);
-
-        String command = what.substring(0, comma1Index);
-        String firstArg = what.substring(comma1Index + 1, comma2Index);
-        String secondArg = what.substring(comma2Index + 1, comma3Index);
-        String thirdArg = what.substring(comma3Index + 1, what.length());
-
-        /*
-        Serial.println("command " + command);
-        Serial.println("firstArg " + firstArg);
-        Serial.println("secondArg " + secondArg);
-        Serial.println("thirdArg " + thirdArg);
-        */
-
-        setServoPosition(firstArg.toInt(), secondArg.toInt(), thirdArg.toInt());
-  
-        Serial.print("Remaining memory: ");
-        Serial.println(freeMemory());
+        if (c == ';')
+        {
+            buffer[bufferIndex] = '\0';
+            createEventFromStr(buffer);
+            bufferIndex = 0;
     }
-
-    if (what.startsWith("processArray"))
+        else
     {
-        processNotesArray();
+            buffer[bufferIndex] = c;
+            bufferIndex++;
     }
+    }
+}
 
-    if (what.startsWith("SetMenu"))
+void parseEvent(EventType what, int * args)
     {
-        int comma1Index = what.indexOf(',');
+    switch (what)
+    {
+        case SetServoPosition:
+            setServoPosition(args[0], args[1], args[2]);
+            break;
 
-        String command = what.substring(0, comma1Index);
-        String firstArg = what.substring(comma1Index + 1, what.length());
+        case PlayNote:
+            playNote(args[0]);
+            break;
 
-        // Go to notes menu
-        if (firstArg.equals("NotesMenu1"))
+        case SetMenu:
+            if (args[0] == NotesMenu)
         {
             currentMenu = notesMenu[0];
         } 
-        
-        // Go to song menu
-        if (firstArg.equals("SongMenu1"))
+            else if (args[0] == SongMenu)
         {
             currentMenu = songMenu1;
         }
-        
-        // Go back from song menu
-        if (firstArg.equals("MainMenu2"))
+            else if (args[0] == MainMenu)
         {
-            currentMenu = mainMenu2;
+                currentMenu = mainMenu1;
         }
 
         printToLCD(currentMenu->caption, currentMenu->bottomNeighbour->caption, 0);
-    }
+            break;
 
-    if (what.startsWith("Play"))
+        case Init:
+            if (args[0] == Up)
     {
-        int comma1Index = what.indexOf(',');
-        String firstArg = what.substring(comma1Index + 1, what.length());
-
-        playNote(firstArg.toInt());
+                moveAllServosUp();
     }
-
-    if (what.startsWith("Song"))
+            else if (args[0] == Down)
     {
-        int comma1Index = what.indexOf(',');
-        String firstArg = what.substring(comma1Index + 1, what.length());
+                moveAllServosDown();
+            }
+            else if (args[0] == Center)
+            {
+                moveAllServosCenter();
+            }
+            break;
 
-        if (firstArg.equals("Lux"))
+        case PlaySong:
+            if (args[0] == AgeOfEmpiresTheme)
         {
+                generateEventsFromPROGMEM(ageOfEmpires);
+            }
+            else if (args[0] == LuxembourgAnthem)
+            {
             currentArrayPosition = 0;
             currentArraySize = luxembourgAnthemSize;
             currentNotesArray = luxembourgAnthemNotes;
@@ -228,33 +231,14 @@ void parseEvent(String what)
 
             processNotesArray();
         }
+            break;
 
-        if (firstArg.equals("Age"))
-        {
-            char c;
-            const char * currentChar = ageOfEmpires;
+        case ProcessCurrentArray:
+            processNotesArray();
+            break;
 
-            char buffer[10];
-            int bufferIndex = 0;
-
-            while((c = pgm_read_byte(currentChar++)))
-            {
-                Serial.print(c);
-                notesString.concat(c);
-
-                if (c == ';')
-                {
-                    buffer[bufferIndex] = '\0';
-                    createEventFromStr(buffer);
-                    bufferIndex = 0;
-            }
-                else
-                {
-                    buffer[bufferIndex] = c;
-                    bufferIndex++;
-        }
-    }
-}
+        default:
+            break;
     }
 }
 
@@ -290,10 +274,13 @@ void moveServoDown(int board, int servo)
 
     setServoPosition(board, servo, map(servoDownPosition, 0, 180, servoMin, servoMax));
 
-    addEvent(new MyEvent(millis() + servoTravelTime, "relax, " + 
-            String(board) + ", " + 
-            String(servo) + ", " + 
-    String(map(servoDownPosition + servoRelaxAmountToAdd, 0, 180, servoMin, servoMax)))); 
+    int* args = new int [3];
+
+    args[0] = board;
+    args[1] = servo;
+    args[2] = map(servoDownPosition + servoRelaxAmountToAdd, 0, 180, servoMin, servoMax);
+
+    addEvent(new MyEvent(millis() + servoTravelTime, SetServoPosition, args));
 }
 
 void moveServoUp(int board, int servo)
@@ -316,10 +303,13 @@ void moveServoUp(int board, int servo)
 
     setServoPosition(board, servo, map(servoUpPosition, 0, 180, servoMin, servoMax));
 
-    addEvent(new MyEvent(millis() + servoTravelTime, "relax, " + 
-            String(board) + ", " + 
-            String(servo) + ", " + 
-    String(map(servoUpPosition + servoRelaxAmountToAdd, 0, 180, servoMin, servoMax)))); 
+    int* args = new int [3];
+
+    args[0] = board;
+    args[1] = servo;
+    args[2] = map(servoUpPosition + servoRelaxAmountToAdd, 0, 180, servoMin, servoMax);
+
+    addEvent(new MyEvent(millis() + servoTravelTime, SetServoPosition, args));
 }
 
 void toggleServo(int board, int servo)
@@ -386,6 +376,8 @@ void moveAllServosDown()
         moveServoDown(2, i);
     }
 }
+
+long millisLastNotePlayed = 0;
 
 void playNote(int note)
 {
@@ -463,8 +455,18 @@ void playNote(int note)
         break;
     }
 
-    Serial.print("Total notes played: ");
+    long millisCurrentNote = millis();
+
+    Serial.print("ms: ");
+    Serial.print(millisCurrentNote);
+    Serial.print(" diff: ");
+    Serial.print(millisCurrentNote - millisLastNotePlayed);
+    Serial.print(" Note: ");
+    Serial.print(note);
+    Serial.print(" Total: ");
     Serial.println(totalNotesPlayed);
+
+    millisLastNotePlayed = millisCurrentNote;
 }
 
 void processNotesArray()
@@ -478,7 +480,7 @@ void processNotesArray()
 
     if (currentArrayPosition < currentArraySize)
     {
-        addEvent(new MyEvent(millis() + currentOffset, "processArray"));    
+        addEvent(new MyEvent(millis() + currentOffset, ProcessCurrentArray, NULL));    
     }
 }
 
@@ -538,23 +540,21 @@ void createEventFromStr(char input[])
     char* commaPos = strchr(input, ',');
     * commaPos = 0;
     
-    int note = atoi(input);
+    int* args = new int [1];
+    args[0] = atoi(input);
     
     ++commaPos;
     
     unsigned long offset = atoi(commaPos);
 
-    String what = "Play,";
-    what.concat(note);
-
     if (lastEventDue >= millis())
     {
-        addEvent(new MyEvent((lastEventDue + offset), what)); 
+        addEvent(new MyEvent((lastEventDue + offset), PlayNote, args)); 
         lastEventDue = lastEventDue + offset;
     }
     else
     {
-        addEvent(new MyEvent((millis() + offset), what));
+        addEvent(new MyEvent((millis() + offset), PlayNote, args));
         lastEventDue = millis() + offset;
     }
 }
@@ -591,7 +591,7 @@ void setup()
     moveAllServosUp();
 
     // Link the main menu items
-    mainMenu1->topNeighbour = mainMenu4;
+    mainMenu1->topNeighbour = mainMenu5;
     mainMenu1->bottomNeighbour = mainMenu2;
 
     mainMenu2->topNeighbour = mainMenu1;
@@ -601,7 +601,10 @@ void setup()
     mainMenu3->bottomNeighbour = mainMenu4;
 
     mainMenu4->topNeighbour = mainMenu3;
-    mainMenu4->bottomNeighbour = mainMenu1;
+    mainMenu4->bottomNeighbour = mainMenu5;
+
+    mainMenu5->topNeighbour = mainMenu4;
+    mainMenu5->bottomNeighbour = mainMenu1;
 
     // Link the song menu items
     songMenu1->topNeighbour = songMenu3;
@@ -613,14 +616,12 @@ void setup()
     songMenu3->topNeighbour = songMenu2;
     songMenu3->bottomNeighbour = songMenu1;   
 
+
+
     // Create all the entries for the notes Menu
     for (int i = 0; i < 17; i++)
     {
-        String label = "Play Note ";
-        label.concat(String(i + 1));
-        String command = "Play,";
-        command.concat(String(i + 1));
-        notesMenu[i] = new MyMenu(label, command);
+        notesMenu[i] = new MyMenu(notesArrayText[i], PlayNote, i + 1);
     }
 
     // Link all the inner notes menu items togeather
@@ -700,7 +701,7 @@ void loop()
 
         if (encoderButtonState == true)
         {
-            Serial.println("Button Relaxed");
+            Serial.println("Button Released");
         }
         else
         {
@@ -708,7 +709,7 @@ void loop()
         
             Serial.println(currentMenu->what);
 
-            parseEvent(currentMenu->what);
+            parseEvent(currentMenu->what, currentMenu->args);
         }
     }
 
@@ -718,7 +719,7 @@ void loop()
         // Serial.print(headNode->getWhen());
         // Serial.println(" is now due " + headNode->getWhat());      
         
-        parseEvent(headNode->getWhat());
+        parseEvent(headNode->getWhat(), headNode->getArguments());
         nodeToDelete = headNode;
         headNode = headNode->getNext();
         delete nodeToDelete;
@@ -758,9 +759,9 @@ void loop()
             {
                 for (int i = 1; i <= 17; i++)
         {
-                    String what = "Play,";
-                    what.concat(i);
-                    addEvent(new MyEvent(millis() + (i * 100), what));   
+                    int* args = new int [1];
+                    args[0] = i;
+                    addEvent(new MyEvent(millis() + (i * 250), PlayNote, args));
                 }
         }
         else
