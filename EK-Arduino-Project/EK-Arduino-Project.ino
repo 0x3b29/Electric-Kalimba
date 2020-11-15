@@ -42,6 +42,11 @@ const PROGMEM unsigned short int luxembourgAnthemOffsets[146] = {2, 475, 3, 848,
 
 const PROGMEM char ageOfEmpires[] = "6,500;9,700;11,300;10,300;9,300;10,800;6,500;9,700;11,300;10,300;9,300;12,800;6,500;9,700;11,300;10,300;9,300;10,800;10,500;10,700;11,300;10,300;8,300;9,1500;10,300;13,300;12,300;14,800;17,300;16,700;14,200;13,200;14,300;16,1000;10,300;13,300;12,300;10,500;9,400;12,600;10,1500;3,20;10,500;6,20;13,700;8,20;15,300;7,20;14,300;6,20;13,300;7,20;14,800;3,20;10,500;6,20;13,700;8,20;15,300;7,20;14,300;6,20;13,300;9,20;16,800;3,20;10,500;6,20;13,700;8,20;15,300;7,20;14,300;6,20;13,300;7,20;14,800;7,20;14,500;7,20;14,700;8,20;15,300;7,20;14,300;5,20;12,300;6,20;13,800;";
 
+int totalNotesPlayed = 0;
+unsigned long lastEventDue = 0;
+
+char input[11];
+
 MyEvent* headNode;
 MyEvent* nodeToDelete;
 
@@ -122,6 +127,24 @@ void addEvent(MyEvent* newEvent)
     }
 }
 
+#ifdef __arm__
+// should use uinstd.h to define sbrk but Due causes a conflict
+extern "C" char* sbrk(int incr);
+#else  // __ARM__
+extern char *__brkval;
+#endif  // __arm__
+
+int freeMemory() {
+  char top;
+#ifdef __arm__
+  return &top - reinterpret_cast<char*>(sbrk(0));
+#elif defined(CORE_TEENSY) || (ARDUINO > 103 && ARDUINO != 151)
+  return &top - __brkval;
+#else  // __arm__
+  return __brkval ? &top - __brkval : &top - __malloc_heap_start;
+#endif  // __arm__
+}
+
 void parseEvent(String what)
 {
     if (what.startsWith("relax"))
@@ -145,11 +168,9 @@ void parseEvent(String what)
         */
 
         setServoPosition(firstArg.toInt(), secondArg.toInt(), thirdArg.toInt());
-    }
   
-    if (what.startsWith("process"))
-    {
-        processNotesString();
+        Serial.print("Remaining memory: ");
+        Serial.println(freeMemory());
     }
 
     if (what.startsWith("processArray"))
@@ -213,14 +234,27 @@ void parseEvent(String what)
             char c;
             const char * currentChar = ageOfEmpires;
 
+            char buffer[10];
+            int bufferIndex = 0;
+
             while((c = pgm_read_byte(currentChar++)))
             {
                 Serial.print(c);
                 notesString.concat(c);
-            }
 
-            processNotesString();
+                if (c == ';')
+                {
+                    buffer[bufferIndex] = '\0';
+                    createEventFromStr(buffer);
+                    bufferIndex = 0;
+            }
+                else
+                {
+                    buffer[bufferIndex] = c;
+                    bufferIndex++;
         }
+    }
+}
     }
 }
 
@@ -355,6 +389,9 @@ void moveAllServosDown()
 
 void playNote(int note)
 {
+    totalNotesPlayed++;
+
+
     switch(note)
     {
         case 1:
@@ -425,30 +462,9 @@ void playNote(int note)
         toggleServo(2, 7);
         break;
     }
-}
 
-void processNotesString()
-{
-    // Serial.println("notesString: '" + notesString + "'");
-
-    if (notesString.indexOf(',') > 0)
-    {
-        int colonIndex = notesString.indexOf(';');
-    
-        String data = notesString.substring(0, colonIndex);
-        notesString.remove(0, colonIndex + 1);
-        
-        int commaIndex = data.indexOf(',');
-        String firstValue = data.substring(0, commaIndex);
-        String secondValue = data.substring(commaIndex + 1);
-    
-        Serial.println("Play Note " + firstValue + " and then wait " + secondValue + "ms");
-    
-        playNote(firstValue.toInt());
-        
-        // Add an event to the queue to process the next bit of the notesStrign after some waiting period
-        addEvent(new MyEvent(millis() + secondValue.toInt(), "process"));       
-    }
+    Serial.print("Total notes played: ");
+    Serial.println(totalNotesPlayed);
 }
 
 void processNotesArray()
@@ -515,6 +531,32 @@ void printToLCD(String firstLine, String secondLine, int selectedLine)
     lcd.print(upperLine);
     lcd.setCursor(0, 1);
     lcd.print(lowerLine);
+}
+
+void createEventFromStr(char input[])
+{
+    char* commaPos = strchr(input, ',');
+    * commaPos = 0;
+    
+    int note = atoi(input);
+    
+    ++commaPos;
+    
+    unsigned long offset = atoi(commaPos);
+
+    String what = "Play,";
+    what.concat(note);
+
+    if (lastEventDue >= millis())
+    {
+        addEvent(new MyEvent((lastEventDue + offset), what)); 
+        lastEventDue = lastEventDue + offset;
+    }
+    else
+    {
+        addEvent(new MyEvent((millis() + offset), what));
+        lastEventDue = millis() + offset;
+    }
 }
 
 void setup() 
@@ -600,6 +642,8 @@ void setup()
 
     // Output menu 
     printToLCD(currentMenu->caption, currentMenu->bottomNeighbour->caption, 0);
+
+    Serial.setTimeout(600000);
 }
 
 void loop()
@@ -682,52 +726,52 @@ void loop()
     }
 
     // Process serial input 
-    if (Serial.available() > 0)
+    while (Serial.available() > 0)
     {    
-        serialInput = Serial.readString();
-        Serial.println("Got '" + serialInput + "'");
+        int size = Serial.readBytesUntil(';', input, 10);
+        input[size] = '\0';
 
-        if (serialInput.charAt(0) == 'c')
+        char* commaPos = strchr(input, ',');
+
+        if(commaPos != NULL)
+        {
+            createEventFromStr(input);
+        }
+        else
+        {
+            if (input[0] == 'c')
         {
             Serial.println("Centering ...");
             moveAllServosCenter();
         }
-
-        if (serialInput.charAt(0) == 'u')
+            else if (input[0] == 'u')
         {
             Serial.println("Upping ...");
             moveAllServosUp();
         }
-
-        if (serialInput.charAt(0) == 'd')
+            else if (input[0] == 'd')
         {
             Serial.println("Downing ...");
             moveAllServosDown();
         }
-
-        if (serialInput.indexOf(',') > 0)
+            else if (input[0] == 'x')
+            {
+                for (int i = 1; i <= 17; i++)
         {
-            notesString = serialInput;
-            processNotesString();
+                    String what = "Play,";
+                    what.concat(i);
+                    addEvent(new MyEvent(millis() + (i * 100), what));   
+                }
         }
         else
         {
-            int val = serialInput.toInt();
+                int val = atoi(input);
 
             if (val > 0)
             {
                 playNote(val);
             }
         }
-
-        if (serialInput.startsWith("100"))
-        {
-            for (int i = 1; i <= 17; i++)
-            {
-                String what = "Play,";
-                what.concat(i);
-                addEvent(new MyEvent(millis() + (i * 100), what));   
-            }
         }
     }
 }
