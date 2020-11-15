@@ -4,6 +4,7 @@
 #include "MyMenu.h"
 #include <Encoder.h>
 #include "MyEnums.h"
+#include "MyNotes.h"
 
 Adafruit_PWMServoDriver leftServoBoard = Adafruit_PWMServoDriver(0x40);    //Create an object of board 1
 Adafruit_PWMServoDriver rightServoBoard = Adafruit_PWMServoDriver(0x41);    //Create an object of board 2 
@@ -80,6 +81,10 @@ Encoder encoder(2, 3);
 // Keep global encoder state
 int oldEncoderDiv4Value = 0;
 long lastEncoderDiv4ButtonPressedValue = 0;
+
+// Add a passive Buzzer
+int passiveBuzzerDuration = 100;
+int passiveBuzzerPin = 6;
 
 void addEvent(MyEvent* newEvent)
 {
@@ -164,51 +169,51 @@ void generateEventsFromPROGMEM(const char * startChar)
             buffer[bufferIndex] = '\0';
             createEventFromStr(buffer);
             bufferIndex = 0;
-    }
+        }
         else
-    {
+        {
             buffer[bufferIndex] = c;
             bufferIndex++;
-    }
+        }
     }
 }
 
 void parseEvent(EventType what, int * args)
-    {
+{
     switch (what)
     {
         case SetServoPosition:
             setServoPosition(args[0], args[1], args[2]);
             break;
-
+        
         case PlayNote:
             playNote(args[0]);
             break;
 
         case SetMenu:
             if (args[0] == NotesMenu)
-        {
-            currentMenu = notesMenu[0];
-        } 
+            {
+                currentMenu = notesMenu[0];
+            }
             else if (args[0] == SongMenu)
-        {
-            currentMenu = songMenu1;
-        }
+            {
+                currentMenu = songMenu1;
+            }
             else if (args[0] == MainMenu)
-        {
+            {
                 currentMenu = mainMenu1;
-        }
+            }
 
-        printToLCD(currentMenu->caption, currentMenu->bottomNeighbour->caption, 0);
+            printToLCD(currentMenu->caption, currentMenu->bottomNeighbour->caption, 0);
             break;
 
         case Init:
             if (args[0] == Up)
-    {
+            {
                 moveAllServosUp();
-    }
+            }
             else if (args[0] == Down)
-    {
+            {
                 moveAllServosDown();
             }
             else if (args[0] == Center)
@@ -219,18 +224,18 @@ void parseEvent(EventType what, int * args)
 
         case PlaySong:
             if (args[0] == AgeOfEmpiresTheme)
-        {
+            {
                 generateEventsFromPROGMEM(ageOfEmpires);
             }
             else if (args[0] == LuxembourgAnthem)
             {
-            currentArrayPosition = 0;
-            currentArraySize = luxembourgAnthemSize;
-            currentNotesArray = luxembourgAnthemNotes;
-            currentOffsetsArray = luxembourgAnthemOffsets;
+                currentArrayPosition = 0;
+                currentArraySize = luxembourgAnthemSize;
+                currentNotesArray = luxembourgAnthemNotes;
+                currentOffsetsArray = luxembourgAnthemOffsets;
 
-            processNotesArray();
-        }
+                processNotesArray();
+            }
             break;
 
         case ProcessCurrentArray:
@@ -383,74 +388,90 @@ void playNote(int note)
 {
     totalNotesPlayed++;
 
-
     switch(note)
     {
         case 1:
+        tone(passiveBuzzerPin, NOTE_C5, passiveBuzzerDuration);
         toggleServo(1, 8);
         break;
 
         case 2:
+        tone(passiveBuzzerPin, NOTE_D5, passiveBuzzerDuration);
         toggleServo(1, 7);
         break;
             
         case 3:
+        tone(passiveBuzzerPin, NOTE_E5, passiveBuzzerDuration);
         toggleServo(2, 0);
         break;
 
         case 4:
+        tone(passiveBuzzerPin, NOTE_F5, passiveBuzzerDuration);
         toggleServo(1, 6);
         break;
 
         case 5:
+        tone(passiveBuzzerPin, NOTE_G5, passiveBuzzerDuration);
         toggleServo(2, 1);
         break;
 
         case 6:
+        tone(passiveBuzzerPin, NOTE_A6, passiveBuzzerDuration);
         toggleServo(1, 5);
         break;
 
         case 7:
+        tone(passiveBuzzerPin, NOTE_B6, passiveBuzzerDuration);
         toggleServo(2, 2);
         break;
 
         case 8:
+        tone(passiveBuzzerPin, NOTE_C6, passiveBuzzerDuration);
         toggleServo(1, 4);
         break;
 
         case 9:
+        tone(passiveBuzzerPin, NOTE_D6, passiveBuzzerDuration);
         toggleServo(2, 3);
         break;
 
         case 10:
+        tone(passiveBuzzerPin, NOTE_E6, passiveBuzzerDuration);
         toggleServo(1, 3);
         break;
 
         case 11:
+        tone(passiveBuzzerPin, NOTE_F6, passiveBuzzerDuration);
         toggleServo(2, 4);
         break;
 
         case 12:
+        tone(passiveBuzzerPin, NOTE_G6, passiveBuzzerDuration);
         toggleServo(1, 2);
         break;
 
         case 13:
+        tone(passiveBuzzerPin, NOTE_A7, passiveBuzzerDuration);
         toggleServo(2, 5);
         break;
 
         case 14:
+        tone(passiveBuzzerPin, NOTE_B7, passiveBuzzerDuration);
         toggleServo(1, 1);
         break;
 
         case 15:
+        tone(passiveBuzzerPin, NOTE_C7, passiveBuzzerDuration);
         toggleServo(2, 6);
         break;
 
         case 16:
+        tone(passiveBuzzerPin, NOTE_D7, passiveBuzzerDuration);
         toggleServo(1, 0);
         break;
 
         case 17:
+        tone(passiveBuzzerPin, NOTE_E7, passiveBuzzerDuration);
         toggleServo(2, 7);
         break;
     }
@@ -542,7 +563,7 @@ void createEventFromStr(char input[])
     
     int* args = new int [1];
     args[0] = atoi(input);
-    
+
     ++commaPos;
     
     unsigned long offset = atoi(commaPos);
@@ -741,38 +762,38 @@ void loop()
         else
         {
             if (input[0] == 'c')
-        {
-            Serial.println("Centering ...");
-            moveAllServosCenter();
-        }
+            {
+                Serial.println("Centering ...");
+                moveAllServosCenter();
+            } 
             else if (input[0] == 'u')
-        {
-            Serial.println("Upping ...");
-            moveAllServosUp();
-        }
+            {
+                Serial.println("Upping ...");
+                moveAllServosUp();
+            }
             else if (input[0] == 'd')
-        {
-            Serial.println("Downing ...");
-            moveAllServosDown();
-        }
+            {
+                Serial.println("Downing ...");
+                moveAllServosDown();
+            }
             else if (input[0] == 'x')
             {
                 for (int i = 1; i <= 17; i++)
-        {
+                {
                     int* args = new int [1];
                     args[0] = i;
                     addEvent(new MyEvent(millis() + (i * 250), PlayNote, args));
                 }
-        }
-        else
-        {
+            }
+            else
+            {
                 int val = atoi(input);
 
-            if (val > 0)
-            {
-                playNote(val);
+                if (val > 0)
+                {
+                    playNote(val);
+                }
             }
-        }
         }
     }
 }
