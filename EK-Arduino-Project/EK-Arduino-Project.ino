@@ -29,6 +29,7 @@ bool rightServosUp[8];
 
 String selectedPrefix = "> ";
 String emptyPrefix = "  ";
+bool wasLastdirectionUp = false;
 
 short currentArrayPosition;
 short currentArraySize;
@@ -49,6 +50,7 @@ const char notesArrayText[][13] = {"Play Note 1", "Play Note 2", "Play Note 3", 
 int totalNotesPlayed = 0;
 unsigned long lastEventDue = 0;
 unsigned long lastOffset;
+unsigned long millisLastNotePlayed = 0;
 
 char input[11];
 
@@ -58,15 +60,17 @@ MyEvent* nodeToDelete;
 // Create the menu items
 MyMenu* currentMenu;
 
-MyMenu* mainMenu1 = new MyMenu("Play Notes", SetMenu, NotesMenu);
-MyMenu* mainMenu2 = new MyMenu("Play Songs", SetMenu, SongMenu);
-MyMenu* mainMenu3 = new MyMenu("Init All Up", Init, Up);
-MyMenu* mainMenu4 = new MyMenu("Init All Down", Init, Down);
-MyMenu* mainMenu5 = new MyMenu("Init All Center", Init, Down);
+MyMenu* mainMenu1 = new MyMenu((char *)"Play Notes", SetMenu, NotesMenu);
+MyMenu* mainMenu2 = new MyMenu((char *)"Play Songs", SetMenu, SongMenu);
 
-MyMenu* songMenu1 = new MyMenu("Age of Empires",PlaySong, AgeOfEmpiresTheme);
-MyMenu* songMenu2 = new MyMenu("Luxebourg Anth.",PlaySong, LuxembourgAnthem);
-MyMenu* songMenu3 = new MyMenu("Back", SetMenu, MainMenu);
+MyMenu* mainMenu3 = new MyMenu((char *)"Init All Up", Init, Up);
+MyMenu* mainMenu4 = new MyMenu((char *)"Init All Down", Init, Down);
+MyMenu* mainMenu5 = new MyMenu((char *)"Init All Center", Init, Center);
+MyMenu* mainMenu6 = new MyMenu((char *)"Buzzer is Off", ToggleBuzzer, 0);
+
+MyMenu* songMenu1 = new MyMenu((char *)"Age of Empires",PlaySong, AgeOfEmpiresTheme);
+MyMenu* songMenu2 = new MyMenu((char *)"Luxebourg Anth.",PlaySong, LuxembourgAnthem);
+MyMenu* songMenu3 = new MyMenu((char *)"Back", SetMenu, MainMenu);
 
 MyMenu* notesMenu[17];
 
@@ -86,6 +90,7 @@ long lastEncoderDiv4ButtonPressedValue = 0;
 // Add a passive Buzzer
 int passiveBuzzerDuration = 100;
 int passiveBuzzerPin = 6;
+bool isBuzzerEnabled = false;
 
 void addEvent(MyEvent* newEvent)
 {
@@ -116,6 +121,7 @@ void addEvent(MyEvent* newEvent)
         if (currentNode == headNode)
         {
             // Serial.print("Event will be new head");
+
             headNode->setPrevious(newEvent);
             newEvent->setNext(headNode);
 
@@ -179,6 +185,18 @@ void generateEventsFromPROGMEM(const char * startChar)
     }
 }
 
+void preparePrintMenuToLCD()
+{
+    if (wasLastdirectionUp)
+    {
+        printToLCD(currentMenu->caption, currentMenu->bottomNeighbour->caption, 0);
+    }
+    else
+    {
+        printToLCD(currentMenu->topNeighbour->caption, currentMenu->caption, 1);
+    }
+}
+
 void parseEvent(EventType what, int * args)
 {
     switch (what)
@@ -221,6 +239,21 @@ void parseEvent(EventType what, int * args)
             {
                 moveAllServosCenter();
             }
+            break;
+
+        case ToggleBuzzer:
+            if (isBuzzerEnabled)
+            {
+                mainMenu6->setCaption((char *)"Buzzer is Off");
+            }
+            else
+            {
+                mainMenu6->setCaption((char *)"Buzzer is On");
+            }
+
+            preparePrintMenuToLCD();
+            isBuzzerEnabled = !isBuzzerEnabled;
+
             break;
 
         case PlaySong:
@@ -383,7 +416,13 @@ void moveAllServosDown()
     }
 }
 
-long millisLastNotePlayed = 0;
+void buzzerNote(int note)
+{
+    if (isBuzzerEnabled)
+    {
+        tone(passiveBuzzerPin, note, passiveBuzzerDuration);;
+    }
+}
 
 void playNote(int note)
 {
@@ -392,87 +431,87 @@ void playNote(int note)
     switch(note)
     {
         case 1:
-        tone(passiveBuzzerPin, NOTE_C5, passiveBuzzerDuration);
+        buzzerNote(NOTE_C5);
         toggleServo(1, 8);
         break;
 
         case 2:
-        tone(passiveBuzzerPin, NOTE_D5, passiveBuzzerDuration);
+        buzzerNote(NOTE_D5);
         toggleServo(1, 7);
         break;
             
         case 3:
-        tone(passiveBuzzerPin, NOTE_E5, passiveBuzzerDuration);
+        buzzerNote(NOTE_E5);
         toggleServo(2, 0);
         break;
 
         case 4:
-        tone(passiveBuzzerPin, NOTE_F5, passiveBuzzerDuration);
+        buzzerNote(NOTE_F5);
         toggleServo(1, 6);
         break;
 
         case 5:
-        tone(passiveBuzzerPin, NOTE_G5, passiveBuzzerDuration);
+        buzzerNote(NOTE_G5);
         toggleServo(2, 1);
         break;
 
         case 6:
-        tone(passiveBuzzerPin, NOTE_A6, passiveBuzzerDuration);
+        buzzerNote(NOTE_A6);
         toggleServo(1, 5);
         break;
 
         case 7:
-        tone(passiveBuzzerPin, NOTE_B6, passiveBuzzerDuration);
+        buzzerNote(NOTE_B6);
         toggleServo(2, 2);
         break;
 
         case 8:
-        tone(passiveBuzzerPin, NOTE_C6, passiveBuzzerDuration);
+        buzzerNote(NOTE_C6);
         toggleServo(1, 4);
         break;
 
         case 9:
-        tone(passiveBuzzerPin, NOTE_D6, passiveBuzzerDuration);
+        buzzerNote(NOTE_D6);
         toggleServo(2, 3);
         break;
 
         case 10:
-        tone(passiveBuzzerPin, NOTE_E6, passiveBuzzerDuration);
+        buzzerNote(NOTE_E6);
         toggleServo(1, 3);
         break;
 
         case 11:
-        tone(passiveBuzzerPin, NOTE_F6, passiveBuzzerDuration);
+        buzzerNote(NOTE_F6);
         toggleServo(2, 4);
         break;
 
         case 12:
-        tone(passiveBuzzerPin, NOTE_G6, passiveBuzzerDuration);
+        buzzerNote(NOTE_G6);
         toggleServo(1, 2);
         break;
 
         case 13:
-        tone(passiveBuzzerPin, NOTE_A7, passiveBuzzerDuration);
+        buzzerNote(NOTE_A7);
         toggleServo(2, 5);
         break;
 
         case 14:
-        tone(passiveBuzzerPin, NOTE_B7, passiveBuzzerDuration);
+        buzzerNote(NOTE_B7);
         toggleServo(1, 1);
         break;
 
         case 15:
-        tone(passiveBuzzerPin, NOTE_C7, passiveBuzzerDuration);
+        buzzerNote(NOTE_C7);
         toggleServo(2, 6);
         break;
 
         case 16:
-        tone(passiveBuzzerPin, NOTE_D7, passiveBuzzerDuration);
+        buzzerNote(NOTE_D7);
         toggleServo(1, 0);
         break;
 
         case 17:
-        tone(passiveBuzzerPin, NOTE_E7, passiveBuzzerDuration);
+        buzzerNote(NOTE_E7);
         toggleServo(2, 7);
         break;
     }
@@ -615,7 +654,7 @@ void setup()
     moveAllServosUp();
 
     // Link the main menu items
-    mainMenu1->topNeighbour = mainMenu5;
+    mainMenu1->topNeighbour = mainMenu6;
     mainMenu1->bottomNeighbour = mainMenu2;
 
     mainMenu2->topNeighbour = mainMenu1;
@@ -628,7 +667,10 @@ void setup()
     mainMenu4->bottomNeighbour = mainMenu5;
 
     mainMenu5->topNeighbour = mainMenu4;
-    mainMenu5->bottomNeighbour = mainMenu1;
+    mainMenu5->bottomNeighbour = mainMenu6;
+
+    mainMenu6->topNeighbour = mainMenu5;
+    mainMenu6->bottomNeighbour = mainMenu1;
 
     // Link the song menu items
     songMenu1->topNeighbour = songMenu3;
@@ -643,7 +685,7 @@ void setup()
     // Create all the entries for the notes Menu
     for (int i = 0; i < 17; i++)
     {
-        notesMenu[i] = new MyMenu(notesArrayText[i], PlayNote, i + 1);
+        notesMenu[i] = new MyMenu((char *)notesArrayText[i], PlayNote, i + 1);
     }
 
     // Link all the inner notes menu items togeather
@@ -666,7 +708,7 @@ void setup()
     // Output menu 
     printToLCD(currentMenu->caption, currentMenu->bottomNeighbour->caption, 0);
 
-    Serial.setTimeout(600000);
+    Serial.setTimeout(5000);
 }
 
 void loop()
@@ -703,12 +745,14 @@ void loop()
 
             if (directionUp)
             {
-                printToLCD(currentMenu->caption, currentMenu->bottomNeighbour->caption, 0);
+                wasLastdirectionUp = true;
             }
             else
             {
-                printToLCD(currentMenu->topNeighbour->caption, currentMenu->caption, 1);
+                wasLastdirectionUp = false;
             }
+
+            preparePrintMenuToLCD();
 
             oldEncoderDiv4Value = newEncoderDiv4Value;
         }
@@ -785,6 +829,20 @@ void loop()
                     args[0] = i;
                     addEvent(new MyEvent(millis() + (i * 250), PlayNote, args));
                 }
+            }
+            else if (input[0] == 'b')
+            {
+                if (isBuzzerEnabled)
+                {
+                    mainMenu6->setCaption((char *)"Buzzer is Off");
+                }
+                else
+                {
+                    mainMenu6->setCaption((char *)"Buzzer is On");
+                }
+
+                preparePrintMenuToLCD();
+                isBuzzerEnabled = !isBuzzerEnabled;
             }
             else
             {
