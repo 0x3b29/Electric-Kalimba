@@ -48,6 +48,7 @@ const char notesArrayText[][13] = {"Play Note 1", "Play Note 2", "Play Note 3", 
 
 int totalNotesPlayed = 0;
 unsigned long lastEventDue = 0;
+unsigned long lastOffset;
 
 char input[11];
 
@@ -570,13 +571,15 @@ void createEventFromStr(char input[])
 
     if (lastEventDue >= millis())
     {
-        addEvent(new MyEvent((lastEventDue + offset), PlayNote, args)); 
-        lastEventDue = lastEventDue + offset;
+        addEvent(new MyEvent((lastEventDue + lastOffset), PlayNote, args)); 
+        lastEventDue = lastEventDue + lastOffset;
+        lastOffset = offset;
     }
     else
     {
-        addEvent(new MyEvent((millis() + offset), PlayNote, args));
-        lastEventDue = millis() + offset;
+        addEvent(new MyEvent((millis()), PlayNote, args));
+        lastEventDue = millis();
+        lastOffset = offset;
     }
 }
 
@@ -636,8 +639,6 @@ void setup()
 
     songMenu3->topNeighbour = songMenu2;
     songMenu3->bottomNeighbour = songMenu1;   
-
-
 
     // Create all the entries for the notes Menu
     for (int i = 0; i < 17; i++)
