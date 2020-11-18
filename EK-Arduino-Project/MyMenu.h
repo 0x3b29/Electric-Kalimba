@@ -2,7 +2,7 @@
 class MyMenu
 {
     public: 
-    MyMenu(const char * caption, EventType what, int arg)
+    MyMenu(char * caption, EventType what, int arg)
     {
         this->caption = caption;
         this->what = what;
@@ -16,4 +16,9 @@ class MyMenu
 
     MyMenu * topNeighbour;
     MyMenu * bottomNeighbour;
+
+    void setCaption(char * newCaption)
+    {
+        this->caption = newCaption;
+    }
 };

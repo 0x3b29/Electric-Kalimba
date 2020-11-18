@@ -8,6 +8,7 @@
         SetMenu,
         Init,
         PlaySong,
+        ToggleBuzzer,
     };
 
     enum InitOption
