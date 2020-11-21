@@ -28,6 +28,7 @@
     enum Song
     {
         LuxembourgAnthem,
-        AgeOfEmpiresTheme
+        AgeOfEmpiresTheme,
+        PipiTheme
     };
 #endif 

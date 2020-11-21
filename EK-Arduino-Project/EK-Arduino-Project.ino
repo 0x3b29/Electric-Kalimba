@@ -41,6 +41,7 @@ const PROGMEM unsigned char luxembourgAnthemNotes[146] = {5, 12, 5, 12, 8, 15, 8
 const PROGMEM unsigned short int luxembourgAnthemOffsets[146] = {2, 475, 3, 848, 3, 192, 3, 522, 3, 440, 3, 468, 3, 492, 3, 807, 3, 153, 3, 455, 3, 225, 2, 250, 3, 686, 3, 257, 2, 1366, 2, 451, 3, 895, 3, 184, 3, 464, 3, 423, 3, 481, 3, 473, 3, 751, 3, 197, 2, 479, 3, 452, 3, 704, 3, 212, 3, 1476, 2, 478, 2, 700, 3, 241, 3, 543, 3, 471, 2, 417, 3, 438, 3, 822, 3, 201, 3, 467, 3, 456, 3, 488, 3, 492, 3, 1426, 2, 465, 3, 505, 3, 214, 3, 224, 3, 454, 3, 560, 3, 677, 2, 189, 3, 521, 3, 455, 3, 780, 3, 205, 3, 428, 3, 479, 3, 1498, 3, 446, 3, 540, 2, 214, 2, 245, 3, 442, 3, 505, 3, 669, 3, 189, 2, 547, 3, 497, 3, 737, 3, 228, 3, 522, 3, 490, 3, 0};
 
 const PROGMEM char ageOfEmpires[] = "6,500;9,700;11,300;10,300;9,300;10,800;6,500;9,700;11,300;10,300;9,300;12,800;6,500;9,700;11,300;10,300;9,300;10,800;10,500;10,700;11,300;10,300;8,300;9,1500;10,300;13,300;12,300;14,800;17,300;16,700;14,200;13,200;14,300;16,1000;10,300;13,300;12,300;10,500;9,400;12,600;10,1500;3,20;10,500;6,20;13,700;8,20;15,300;7,20;14,300;6,20;13,300;7,20;14,800;3,20;10,500;6,20;13,700;8,20;15,300;7,20;14,300;6,20;13,300;9,20;16,800;3,20;10,500;6,20;13,700;8,20;15,300;7,20;14,300;6,20;13,300;7,20;14,800;7,20;14,500;7,20;14,700;8,20;15,300;7,20;14,300;5,20;12,300;6,20;13,800;";
+const PROGMEM char pipiTheme[] = "5,336;8,349;10,312;8,337;9,643;11,132;10,151;9,148;8,173;7,322;9,360;5,297;7,286;8,642;10,669;5,315;8,303;10,301;8,298;9,589;11,135;10,117;9,200;8,173;7,301;9,343;5,313;7,360;8,1080;10,55;17,433;10,55;17,240;10,55;17,229;4,55;11,422;4,55;11,174;10,55;17,183;9,55;16,182;9,55;16,154;9,55;16,180;8,55;15,178;7,55;14,163;8,55;15,197;9,55;16,426;10,56;17,390;10,55;17,169;10,56;17,202;4,55;11,409;4,56;11,137;10,55;17,187;9,55;16,201;9,55;16,212;8,56;15,212;7,55;14,255;8,55;15,921;8,388;9,386;10,373;11,572;13,178;12,174;11,208;10,259;9,200;10,565;5,75;12,119;11,74;4,110;10,75;17,122;9,75;16,170;8,75;15,106;9,75;16,463;11,174;10,172;9,190;8,219;7,168;8,372;9,387;10,237;8,97;15,106;9,96;16,113;10,96;17,155;4,96;11,478;13,194;12,177;11,174;10,262;9,171;10,583;12,183;11,191;10,194;9,234;8,194;9,632;11,201;10,210;9,218;8,279;7,277;8,6;15,0;15,0;";
 
 const char notesArrayText[][13] = {"Play Note 1", "Play Note 2", "Play Note 3", "Play Note 4", 
     "Play Note 5", "Play Note 6", "Play Note 7", "Play Note 8", "Play Note 9", 
@@ -70,7 +71,8 @@ MyMenu* mainMenu6 = new MyMenu((char *)"Buzzer is Off", ToggleBuzzer, 0);
 
 MyMenu* songMenu1 = new MyMenu((char *)"Age of Empires",PlaySong, AgeOfEmpiresTheme);
 MyMenu* songMenu2 = new MyMenu((char *)"Luxebourg Anth.",PlaySong, LuxembourgAnthem);
-MyMenu* songMenu3 = new MyMenu((char *)"Back", SetMenu, MainMenu);
+MyMenu* songMenu3 = new MyMenu((char *)"Pipi Theme",PlaySong, PipiTheme);
+MyMenu* songMenu4 = new MyMenu((char *)"Back", SetMenu, MainMenu);
 
 MyMenu* notesMenu[17];
 
@@ -269,6 +271,10 @@ void parseEvent(EventType what, int * args)
                 currentOffsetsArray = luxembourgAnthemOffsets;
 
                 processNotesArray();
+            }
+            else if (args[0] == PipiTheme)
+            {
+                generateEventsFromPROGMEM(pipiTheme);
             }
             break;
 
@@ -650,7 +656,6 @@ void setup()
 
     // Move all servos to defined positions
     Serial.println("Initialize Up");
-    // lcd.print("Initialize Up");
     moveAllServosUp();
 
     // Link the main menu items
@@ -673,14 +678,17 @@ void setup()
     mainMenu6->bottomNeighbour = mainMenu1;
 
     // Link the song menu items
-    songMenu1->topNeighbour = songMenu3;
+    songMenu1->topNeighbour = songMenu4;
     songMenu1->bottomNeighbour = songMenu2;
 
     songMenu2->topNeighbour = songMenu1;
     songMenu2->bottomNeighbour = songMenu3;
 
     songMenu3->topNeighbour = songMenu2;
-    songMenu3->bottomNeighbour = songMenu1;   
+    songMenu3->bottomNeighbour = songMenu4;   
+
+    songMenu4->topNeighbour = songMenu3;
+    songMenu4->bottomNeighbour = songMenu1;   
 
     // Create all the entries for the notes Menu
     for (int i = 0; i < 17; i++)
