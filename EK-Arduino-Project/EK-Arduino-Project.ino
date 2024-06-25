@@ -5,6 +5,7 @@
 #include <Encoder.h>
 #include "MyEnums.h"
 #include "MyNotes.h"
+#include "Adafruit_Debounce.h"
 
 Adafruit_PWMServoDriver leftServoBoard = Adafruit_PWMServoDriver(0x40);    //Create an object of board 1
 Adafruit_PWMServoDriver rightServoBoard = Adafruit_PWMServoDriver(0x41);    //Create an object of board 2 
@@ -81,13 +82,15 @@ LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
 
 // Prepare the encoder
 const int PinSW = 4;
+Adafruit_Debounce encoderButton(PinSW, LOW);
 long oldEncoderValue = -123456;
-bool encoderButtonState = true;
 Encoder encoder(2, 3);
 
 // Keep global encoder state
 int oldEncoderDiv4Value = 0;
-long lastEncoderDiv4ButtonPressedValue = 0;
+int lastEncoderDiv4ButtonPressedValue = 0;
+unsigned long millisLastEncodeButtonPressed = 0;
+bool freshButtonPressed = false;
 
 // Add a passive Buzzer
 int passiveBuzzerDuration = 100;
@@ -631,6 +634,7 @@ void createEventFromStr(char input[])
 void setup() 
 {
     Serial.begin(115200);
+    encoderButton.begin();
 
     //Start each board
     leftServoBoard.begin();             
@@ -721,6 +725,8 @@ void setup()
 
 void loop()
 {
+    encoderButton.update();
+
     // Check if rotary encoder got turned
     long encoderValue = encoder.read();
     int newEncoderDiv4Value = encoderValue / 4;
@@ -768,23 +774,37 @@ void loop()
 
     // Check if rotary encoder got pressed
     // Also check if encoder state has changed which is important for selecting multiple things in a row (e.g. different notes)
-    if (encoderButtonState != digitalRead(PinSW) || newEncoderDiv4Value != lastEncoderDiv4ButtonPressedValue) 
+
+
+    if (encoderButton.justPressed()) {
+      freshButtonPressed = true;
+      millisLastEncodeButtonPressed = millis();
+      lastEncoderDiv4ButtonPressedValue = newEncoderDiv4Value;
+    }
+
+    unsigned long delta =  millis() - millisLastEncodeButtonPressed;
+
+    bool hasNewClick = false;
+    if (freshButtonPressed && encoderButton.isPressed() && delta > 100) {
+      freshButtonPressed = false;
+      hasNewClick = true;
+    }
+
+    if (hasNewClick || (encoderButton.isPressed() && newEncoderDiv4Value != lastEncoderDiv4ButtonPressedValue))
     {
+        if (encoderButton.isPressed() && newEncoderDiv4Value != lastEncoderDiv4ButtonPressedValue) {
+          Serial.print("Retrigger ");
+          Serial.println(currentMenu->what);
+        }
+
+        if (hasNewClick) {
+          Serial.print("Trigger ");
+          Serial.println(currentMenu->what);
+        }
+
         lastEncoderDiv4ButtonPressedValue = newEncoderDiv4Value;
-        encoderButtonState = digitalRead(PinSW);
-
-        if (encoderButtonState == true)
-        {
-            Serial.println("Button Released");
-        }
-        else
-        {
-            Serial.println("Button Pressed");
         
-            Serial.println(currentMenu->what);
-
-            parseEvent(currentMenu->what, currentMenu->args);
-        }
+        parseEvent(currentMenu->what, currentMenu->args);
     }
 
     // Process event queue
