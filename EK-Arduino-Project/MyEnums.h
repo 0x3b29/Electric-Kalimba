@@ -29,6 +29,7 @@
     {
         LuxembourgAnthem,
         AgeOfEmpiresTheme,
-        PipiTheme
+        PipiTheme,
+        PommerscheTheme,
     };
 #endif 
