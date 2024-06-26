@@ -632,8 +632,8 @@ void createEventFromStr(char input[])
     }
     else
     {
-        addEvent(new MyEvent((millis()), PlayNote, args));
-        lastEventDue = millis();
+        addEvent(new MyEvent((millis() + 250), PlayNote, args));
+        lastEventDue = millis() + 250;
         lastOffset = offset;
     }
 }
