@@ -55,7 +55,8 @@ unsigned long lastEventDue = 0;
 unsigned long lastOffset;
 unsigned long millisLastNotePlayed = 0;
 
-char input[11];
+int bufferPosition;
+char serialInputBuffer [100];
 
 MyEvent* headNode;
 MyEvent* nodeToDelete;
@@ -829,67 +830,104 @@ void loop()
         nodeToDelete = NULL;
     }
 
+    bool didReadSomething = false;
+    bool isValidCommand = false;
+    char serialChar;
+
     // Process serial input 
-    while (Serial.available() > 0)
-    {    
-        int size = Serial.readBytesUntil(';', input, 10);
-        input[size] = '\0';
+    if (Serial.available())
+    {
+        char serialChar = Serial.read();
 
-        char* commaPos = strchr(input, ',');
-
-        if(commaPos != NULL)
-        {
-            createEventFromStr(input);
+        if (serialChar > 0) {
+            didReadSomething = true;
         }
-        else
-        {
-            if (input[0] == 'c')
-            {
-                Serial.println("Centering ...");
-                moveAllServosCenter();
-            } 
-            else if (input[0] == 'u')
-            {
-                Serial.println("Upping ...");
-                moveAllServosUp();
-            }
-            else if (input[0] == 'd')
-            {
-                Serial.println("Downing ...");
-                moveAllServosDown();
-            }
-            else if (input[0] == 'x')
-            {
-                for (int i = 1; i <= 17; i++)
-                {
-                    int* args = new int [1];
-                    args[0] = i;
-                    addEvent(new MyEvent(millis() + (i * 250), PlayNote, args));
-                }
-            }
-            else if (input[0] == 'b')
-            {
-                if (isBuzzerEnabled)
-                {
-                    mainMenu6->setCaption((char *)"Buzzer is Off");
-                }
-                else
-                {
-                    mainMenu6->setCaption((char *)"Buzzer is On");
-                }
 
-                preparePrintMenuToLCD();
-                isBuzzerEnabled = !isBuzzerEnabled;
+        if (serialChar == ';')
+        {
+            isValidCommand = true;
+            serialInputBuffer[bufferPosition] = '\0';
+        }else if (serialChar > 40 && serialChar < 127) {
+            serialInputBuffer[bufferPosition] = serialChar;
+            bufferPosition++;
+        }
+    }
+
+    if (didReadSomething == false) {
+        return;
+    }
+
+    if (didReadSomething == true && isValidCommand == false) {
+        return;
+    }
+
+/*
+// Note: if these prints are active, reading large data chunks will result in input buffer overflows
+Serial.print("Good: '");
+Serial.print(serialInputBuffer);
+Serial.print("', bufferPosition: ");
+Serial.println (bufferPosition);
+Serial.println (serialInputBuffer[0]);
+*/
+
+    char* commaPos = strchr(serialInputBuffer, ',');
+
+    if(commaPos != NULL)
+    {
+        createEventFromStr(serialInputBuffer);
+    }
+    else
+    {
+        if (serialInputBuffer[0] == 'c')
+        {
+            Serial.println("Centering ...");
+            moveAllServosCenter();
+        } 
+        else if (serialInputBuffer[0] == 'u')
+        {
+            Serial.println("Upping ...");
+            moveAllServosUp();
+        }
+        else if (serialInputBuffer[0] == 'd')
+        {
+            Serial.println("Downing ...");
+            moveAllServosDown();
+        }
+        else if (serialInputBuffer[0] == 'x')
+        {
+            Serial.println("Xing ...");
+            for (int i = 1; i <= 17; i++)
+            {
+                int* args = new int [1];
+                args[0] = i;
+                addEvent(new MyEvent(millis() + (i * 250), PlayNote, args));
+            }
+        }
+        else if (serialInputBuffer[0] == 'b')
+        {
+            if (isBuzzerEnabled)
+            {
+                mainMenu6->setCaption((char *)"Buzzer is Off");
             }
             else
             {
-                int val = atoi(input);
+                mainMenu6->setCaption((char *)"Buzzer is On");
+            }
 
-                if (val > 0)
-                {
-                    playNote(val);
-                }
+            preparePrintMenuToLCD();
+            isBuzzerEnabled = !isBuzzerEnabled;
+        }
+        else
+        {
+            int val = atoi(serialInputBuffer);
+
+            if (val > 0)
+            {
+                playNote(val);
             }
         }
     }
+
+    bufferPosition = 0;
+    serialInputBuffer[0] = 0;
 }
