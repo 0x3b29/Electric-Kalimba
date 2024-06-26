@@ -31,5 +31,6 @@
         AgeOfEmpiresTheme,
         PipiTheme,
         PommerscheTheme,
+        RomanticFlight
     };
 #endif 
