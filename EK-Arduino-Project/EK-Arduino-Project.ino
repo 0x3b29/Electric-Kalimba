@@ -1,15 +1,15 @@
 
-#include "EventManager.h"
-#include "Menu.h"
-#include "Enums.h"
-#include "Servo.h"
-#include "Music.h"
-#include "Memory.h"
-#include <Encoder.h>
 #include "Adafruit_Debounce.h"
+#include "Enums.h"
+#include "EventManager.h"
+#include "Memory.h"
+#include "Menu.h"
+#include "Music.h"
+#include "Servo.h"
+#include <Encoder.h>
 
 int bufferPosition;
-char serialInputBuffer [100];
+char serialInputBuffer[100];
 
 // Prepare the encoder
 const int PinSW = 4;
@@ -23,7 +23,7 @@ int lastEncoderDiv4ButtonPressedValue = 0;
 unsigned long millisLastEncodeButtonPressed = 0;
 bool freshButtonPressed = false;
 
-void setup() 
+void setup()
 {
     Serial.begin(115200);
     encoderButton.begin();
@@ -31,7 +31,7 @@ void setup()
     initializeServos();
 
     // Define the switch on the rotary encoder
-    pinMode(PinSW,INPUT);
+    pinMode(PinSW, INPUT);
     digitalWrite(PinSW, HIGH);
 
     initializeLcd();
@@ -87,7 +87,7 @@ void loop()
                 wasLastdirectionUp = false;
             }
 
-            preparePrintMenuToLCD(); 
+            preparePrintMenuToLCD();
 
             oldEncoderDiv4Value = newEncoderDiv4Value;
         }
@@ -95,35 +95,38 @@ void loop()
 
     // Check if rotary encoder got pressed
     // Also check if encoder state has changed which is important for selecting multiple things in a row (e.g. different notes)
-    if (encoderButton.justPressed()) 
+    if (encoderButton.justPressed())
     {
-      freshButtonPressed = true;
-      millisLastEncodeButtonPressed = millis();
-      lastEncoderDiv4ButtonPressedValue = newEncoderDiv4Value;
+        freshButtonPressed = true;
+        millisLastEncodeButtonPressed = millis();
+        lastEncoderDiv4ButtonPressedValue = newEncoderDiv4Value;
     }
 
-    unsigned long delta =  millis() - millisLastEncodeButtonPressed;
+    unsigned long delta = millis() - millisLastEncodeButtonPressed;
 
     bool hasNewClick = false;
-    if (freshButtonPressed && encoderButton.isPressed() && delta > 100) {
-      freshButtonPressed = false;
-      hasNewClick = true;
+    if (freshButtonPressed && encoderButton.isPressed() && delta > 100)
+    {
+        freshButtonPressed = false;
+        hasNewClick = true;
     }
 
     if (hasNewClick || (encoderButton.isPressed() && newEncoderDiv4Value != lastEncoderDiv4ButtonPressedValue))
     {
-        if (encoderButton.isPressed() && newEncoderDiv4Value != lastEncoderDiv4ButtonPressedValue) {
-          Serial.print("Retrigger ");
-          Serial.println(currentMenu->eventType);
+        if (encoderButton.isPressed() && newEncoderDiv4Value != lastEncoderDiv4ButtonPressedValue)
+        {
+            Serial.print("Retrigger ");
+            Serial.println(currentMenu->eventType);
         }
 
-        if (hasNewClick) {
-          Serial.print("Trigger ");
-          Serial.println(currentMenu->eventType);
+        if (hasNewClick)
+        {
+            Serial.print("Trigger ");
+            Serial.println(currentMenu->eventType);
         }
 
         lastEncoderDiv4ButtonPressedValue = newEncoderDiv4Value;
-        
+
         parseEvent(currentMenu->eventType, currentMenu->args);
     }
 
@@ -131,8 +134,8 @@ void loop()
     while (headNode != NULL && headNode->getInvokeTime() < millis())
     {
         // Serial.print(headNode->getInvokeTime());
-        // Serial.println(" is now due " + headNode->getEventType());      
-        
+        // Serial.println(" is now due " + headNode->getEventType());
+
         parseEvent(headNode->getEventType(), headNode->getArguments());
         nodeToDelete = headNode;
         headNode = headNode->getNext();
@@ -144,12 +147,13 @@ void loop()
     bool isValidCommand = false;
     char serialChar;
 
-    // Process serial input 
+    // Process serial input
     if (Serial.available())
     {
         char serialChar = Serial.read();
 
-        if (serialChar > 0) {
+        if (serialChar > 0)
+        {
             didReadSomething = true;
         }
 
@@ -158,33 +162,35 @@ void loop()
             isValidCommand = true;
             serialInputBuffer[bufferPosition] = '\0';
         }
-        else if (serialChar > 40 && serialChar < 127) 
+        else if (serialChar > 40 && serialChar < 127)
         {
             serialInputBuffer[bufferPosition] = serialChar;
             bufferPosition++;
         }
     }
 
-    if (didReadSomething == false) {
+    if (didReadSomething == false)
+    {
         return;
     }
 
-    if (didReadSomething == true && isValidCommand == false) {
+    if (didReadSomething == true && isValidCommand == false)
+    {
         return;
     }
 
-/*
-// Note: if these prints are active, reading large data chunks will result in input buffer overflows
-Serial.print("Good: '");
-Serial.print(serialInputBuffer);
-Serial.print("', bufferPosition: ");
-Serial.println (bufferPosition);
-Serial.println (serialInputBuffer[0]);
-*/
+    /*
+    // Note: if these prints are active, reading large data chunks will result in input buffer overflows
+    Serial.print("Good: '");
+    Serial.print(serialInputBuffer);
+    Serial.print("', bufferPosition: ");
+    Serial.println (bufferPosition);
+    Serial.println (serialInputBuffer[0]);
+    */
 
-    char* commaPos = strchr(serialInputBuffer, ',');
+    char *commaPos = strchr(serialInputBuffer, ',');
 
-    if(commaPos != NULL)
+    if (commaPos != NULL)
     {
         createEventFromStr(serialInputBuffer);
     }
@@ -194,7 +200,7 @@ Serial.println (serialInputBuffer[0]);
         {
             Serial.println("Centering ...");
             moveAllServosCenter();
-        } 
+        }
         else if (serialInputBuffer[0] == 'u')
         {
             Serial.println("Upping ...");
@@ -210,7 +216,7 @@ Serial.println (serialInputBuffer[0]);
             Serial.println("Xing ...");
             for (int i = 1; i <= 17; i++)
             {
-                int* args = new int [1];
+                int *args = new int[1];
                 args[0] = i;
                 addEvent(new Event(millis() + (i * 250), PlayNote, args));
             }

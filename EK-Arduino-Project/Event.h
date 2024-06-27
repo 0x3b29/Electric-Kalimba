@@ -5,17 +5,17 @@
 #include "Enums.h"
 class Event
 {
-    private:
+  private:
     unsigned long invokeTime;
-    
+
     EventType eventType;
-    int * args;
+    int *args;
 
-    Event* next;
-    Event* previous;
+    Event *next;
+    Event *previous;
 
-    public: 
-    Event(long invokeTime, EventType eventType, int * args)
+  public:
+    Event(long invokeTime, EventType eventType, int *args)
     {
         this->invokeTime = invokeTime;
         this->eventType = eventType;
@@ -30,45 +30,24 @@ class Event
 
     ~Event()
     {
-        // The args array is created with "new" to be persistent. 
+        // The args array is created with "new" to be persistent.
         // Not calling delete would therefore result in a memory leak
         delete[] args;
     }
 
-    void setNext(Event* next)
-    {
-        this->next = next;
-    }
+    void setNext(Event *next) { this->next = next; }
 
-    Event* getNext()
-    {
-        return this->next; 
-    }
+    Event *getNext() { return this->next; }
 
-    void setPrevious(Event* previous)
-    {
-        this->previous = previous;
-    }
+    void setPrevious(Event *previous) { this->previous = previous; }
 
-    Event* getPrevious()
-    {
-        return this->previous; 
-    }
+    Event *getPrevious() { return this->previous; }
 
-    unsigned long getInvokeTime()
-    {
-        return this->invokeTime;
-    }
+    unsigned long getInvokeTime() { return this->invokeTime; }
 
-    EventType getEventType()
-    {
-        return this->eventType;
-    }
+    EventType getEventType() { return this->eventType; }
 
-    int* getArguments()
-    {
-        return this->args;
-    }
+    int *getArguments() { return this->args; }
 };
 
 #endif
