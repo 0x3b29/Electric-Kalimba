@@ -1,147 +1,34 @@
 
-#include "Adafruit_Debounce.h"
+#include "EncoderButton.h"
 #include "Enums.h"
 #include "EventManager.h"
 #include "Memory.h"
 #include "Menu.h"
 #include "Music.h"
 #include "Servo.h"
-#include <Encoder.h>
 
 int bufferPosition;
 char serialInputBuffer[100];
 
-// Prepare the encoder
-const int PinSW = 4;
-Adafruit_Debounce encoderButton(PinSW, LOW);
-long oldEncoderValue = -123456;
-Encoder encoder(2, 3);
-
-// Keep global encoder state
-int oldEncoderDiv4Value = 0;
-int lastEncoderDiv4ButtonPressedValue = 0;
-unsigned long millisLastEncodeButtonPressed = 0;
-bool freshButtonPressed = false;
-
 void setup()
 {
     Serial.begin(115200);
-    encoderButton.begin();
+    Serial.setTimeout(5000);
 
+    initializeEncoderButton();
     initializeServos();
-
-    // Define the switch on the rotary encoder
-    pinMode(PinSW, INPUT);
-    digitalWrite(PinSW, HIGH);
-
     initializeLcd();
     initializeMenu();
 
     // Move all servos to defined positions
     Serial.println("Initialize Up");
     moveAllServosUp();
-
-    Serial.setTimeout(5000);
 }
 
 void loop()
 {
-    encoderButton.update();
-
-    // Check if rotary encoder got turned
-    long encoderValue = encoder.read();
-    int newEncoderDiv4Value = encoderValue / 4;
-
-    if (encoderValue != oldEncoderValue)
-    {
-        oldEncoderValue = encoderValue;
-
-        if (newEncoderDiv4Value != oldEncoderDiv4Value)
-        {
-            Serial.print("New Value: ");
-            Serial.println(newEncoderDiv4Value);
-
-            bool directionUp;
-
-            if (newEncoderDiv4Value > oldEncoderDiv4Value)
-            {
-                Serial.println("Scroll up");
-
-                directionUp = true;
-                currentMenu = currentMenu->topNeighbour;
-            }
-            else
-            {
-                Serial.println("Scroll down");
-
-                directionUp = false;
-                currentMenu = currentMenu->bottomNeighbour;
-            }
-
-            if (directionUp)
-            {
-                wasLastdirectionUp = true;
-            }
-            else
-            {
-                wasLastdirectionUp = false;
-            }
-
-            preparePrintMenuToLCD();
-
-            oldEncoderDiv4Value = newEncoderDiv4Value;
-        }
-    }
-
-    // Check if rotary encoder got pressed
-    // Also check if encoder state has changed which is important for selecting multiple things in a row (e.g. different notes)
-    if (encoderButton.justPressed())
-    {
-        freshButtonPressed = true;
-        millisLastEncodeButtonPressed = millis();
-        lastEncoderDiv4ButtonPressedValue = newEncoderDiv4Value;
-    }
-
-    unsigned long delta = millis() - millisLastEncodeButtonPressed;
-
-    bool hasNewClick = false;
-    if (freshButtonPressed && encoderButton.isPressed() && delta > 100)
-    {
-        freshButtonPressed = false;
-        hasNewClick = true;
-    }
-
-    if (hasNewClick || (encoderButton.isPressed() && newEncoderDiv4Value != lastEncoderDiv4ButtonPressedValue))
-    {
-        if (encoderButton.isPressed() && newEncoderDiv4Value != lastEncoderDiv4ButtonPressedValue)
-        {
-            Serial.print("Retrigger ");
-            Serial.println(currentMenu->eventType);
-        }
-
-        if (hasNewClick)
-        {
-            Serial.print("Trigger ");
-            Serial.println(currentMenu->eventType);
-        }
-
-        lastEncoderDiv4ButtonPressedValue = newEncoderDiv4Value;
-
-        parseEvent(currentMenu->eventType, currentMenu->args);
-    }
-
-    // Process event queue
-    while (headNode != NULL && headNode->getInvokeTime() < millis())
-    {
-        // Serial.print(headNode->getInvokeTime());
-        // Serial.println(" is now due " + headNode->getEventType());
-
-        parseEvent(headNode->getEventType(), headNode->getArguments());
-        nodeToDelete = headNode;
-        headNode = headNode->getNext();
-        delete nodeToDelete;
-        nodeToDelete = NULL;
-    }
+    updateEncoderButton();
+    updateEventManager();
 
     bool didReadSomething = false;
     bool isValidCommand = false;

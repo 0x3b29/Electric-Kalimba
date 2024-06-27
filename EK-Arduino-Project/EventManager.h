@@ -5,6 +5,7 @@
 extern Event *headNode;
 extern Event *nodeToDelete;
 
+void updateEventManager();
 void addEvent(Event *newEvent);
 void parseEvent(EventType what, int *args);
 void generateEventsFromPROGMEM(const char *startChar);

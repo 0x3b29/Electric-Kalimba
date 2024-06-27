@@ -10,6 +10,22 @@ Event *nodeToDelete;
 unsigned long lastEventDue = 0;
 unsigned long lastOffset;
 
+void updateEventManager()
+{
+    // Process event queue
+    while (headNode != NULL && headNode->getInvokeTime() < millis())
+    {
+        // Serial.print(headNode->getInvokeTime());
+        // Serial.println(" is now due " + headNode->getEventType());
+
+        parseEvent(headNode->getEventType(), headNode->getArguments());
+        nodeToDelete = headNode;
+        headNode = headNode->getNext();
+        delete nodeToDelete;
+        nodeToDelete = NULL;
+    }
+}
+
 void addEvent(Event *newEvent)
 {
     Event *previousNode = NULL;
