@@ -1,6 +1,6 @@
 #include <Adafruit_PWMServoDriver.h>
 #include <LiquidCrystal.h>
-#include "MyEvent.h"
+#include "Event.h"
 #include "MenuElement.h"
 #include <Encoder.h>
 #include "Enums.h"
@@ -59,8 +59,8 @@ unsigned long millisLastNotePlayed = 0;
 int bufferPosition;
 char serialInputBuffer [100];
 
-MyEvent* headNode;
-MyEvent* nodeToDelete;
+Event* headNode;
+Event* nodeToDelete;
 
 // Create the menu items
 MenuElement* currentMenu;
@@ -102,12 +102,12 @@ int passiveBuzzerDuration = 100;
 int passiveBuzzerPin = 6;
 bool isBuzzerEnabled = false;
 
-void addEvent(MyEvent* newEvent)
+void addEvent(Event* newEvent)
 {
-    MyEvent* previousNode = NULL;
-    MyEvent* currentNode = headNode;
+    Event* previousNode = NULL;
+    Event* currentNode = headNode;
 
-    while (currentNode != NULL && newEvent->getWhen() > currentNode->getWhen())
+    while (currentNode != NULL && newEvent->getInvokeTime() > currentNode->getInvokeTime())
     {
         previousNode = currentNode;
         currentNode = currentNode->getNext();
@@ -140,9 +140,9 @@ void addEvent(MyEvent* newEvent)
         else
         {
             // Serial.print("Event was inbetween ");
-            // Serial.print(currentNode->getPrevious()->getWhen());
+            // Serial.print(currentNode->getPrevious()->getInvokeTime());
             // Serial.print(" and ");
-            // Serial.println(currentNode->getWhen());
+            // Serial.println(currentNode->getInvokeTime());
 
             newEvent->setPrevious(currentNode->getPrevious());
             newEvent->setNext(currentNode);
@@ -341,7 +341,7 @@ void moveServoDown(int board, int servo)
     args[1] = servo;
     args[2] = map(servoDownPosition + servoRelaxAmountToAdd, 0, 180, servoMin, servoMax);
 
-    addEvent(new MyEvent(millis() + servoTravelTime, SetServoPosition, args));
+    addEvent(new Event(millis() + servoTravelTime, SetServoPosition, args));
 }
 
 void moveServoUp(int board, int servo)
@@ -370,7 +370,7 @@ void moveServoUp(int board, int servo)
     args[1] = servo;
     args[2] = map(servoUpPosition + servoRelaxAmountToAdd, 0, 180, servoMin, servoMax);
 
-    addEvent(new MyEvent(millis() + servoTravelTime, SetServoPosition, args));
+    addEvent(new Event(millis() + servoTravelTime, SetServoPosition, args));
 }
 
 void toggleServo(int board, int servo)
@@ -563,7 +563,7 @@ void processNotesArray()
 
     if (currentArrayPosition < currentArraySize)
     {
-        addEvent(new MyEvent(millis() + currentOffset, ProcessCurrentArray, NULL));    
+        addEvent(new Event(millis() + currentOffset, ProcessCurrentArray, NULL));    
     }
 }
 
@@ -632,13 +632,13 @@ void createEventFromStr(char input[])
 
     if (lastEventDue >= millis())
     {
-        addEvent(new MyEvent((lastEventDue + lastOffset), PlayNote, args)); 
+        addEvent(new Event((lastEventDue + lastOffset), PlayNote, args)); 
         lastEventDue = lastEventDue + lastOffset;
         lastOffset = offset;
     }
     else
     {
-        addEvent(new MyEvent((millis() + 250), PlayNote, args));
+        addEvent(new Event((millis() + 250), PlayNote, args));
         lastEventDue = millis() + 250;
         lastOffset = offset;
     }
@@ -813,26 +813,26 @@ void loop()
     {
         if (encoderButton.isPressed() && newEncoderDiv4Value != lastEncoderDiv4ButtonPressedValue) {
           Serial.print("Retrigger ");
-          Serial.println(currentMenu->what);
+          Serial.println(currentMenu->eventType);
         }
 
         if (hasNewClick) {
           Serial.print("Trigger ");
-          Serial.println(currentMenu->what);
+          Serial.println(currentMenu->eventType);
         }
 
         lastEncoderDiv4ButtonPressedValue = newEncoderDiv4Value;
         
-        parseEvent(currentMenu->what, currentMenu->args);
+        parseEvent(currentMenu->eventType, currentMenu->args);
     }
 
     // Process event queue
-    while (headNode != NULL && headNode->getWhen() < millis())
+    while (headNode != NULL && headNode->getInvokeTime() < millis())
     {
-        // Serial.print(headNode->getWhen());
-        // Serial.println(" is now due " + headNode->getWhat());      
+        // Serial.print(headNode->getInvokeTime());
+        // Serial.println(" is now due " + headNode->getEventType());      
         
-        parseEvent(headNode->getWhat(), headNode->getArguments());
+        parseEvent(headNode->getEventType(), headNode->getArguments());
         nodeToDelete = headNode;
         headNode = headNode->getNext();
         delete nodeToDelete;
@@ -909,7 +909,7 @@ Serial.println (serialInputBuffer[0]);
             {
                 int* args = new int [1];
                 args[0] = i;
-                addEvent(new MyEvent(millis() + (i * 250), PlayNote, args));
+                addEvent(new Event(millis() + (i * 250), PlayNote, args));
             }
         }
         else if (serialInputBuffer[0] == 'b')

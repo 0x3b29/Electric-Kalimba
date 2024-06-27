@@ -1,65 +1,65 @@
 #include "Enums.h"
 
-class MyEvent
+class Event
 {
     private:
-    unsigned long when;
+    unsigned long invokeTime;
     
-    EventType what;
+    EventType eventType;
     int * args;
 
-    MyEvent* next;
-    MyEvent* previous;
+    Event* next;
+    Event* previous;
 
     public: 
-    MyEvent(long when, EventType what, int * args)
+    Event(long invokeTime, EventType eventType, int * args)
     {
-        this->when = when;
-        this->what = what;
+        this->invokeTime = invokeTime;
+        this->eventType = eventType;
         this->args = args;
         //  Serial.print("I am due at: '");
-        //  Serial.print(when);
+        //  Serial.print(invokeTime);
         //  Serial.println("'");
 
         next = NULL;
         previous = NULL;
     }
 
-    ~MyEvent()
+    ~Event()
     {
         // The args array is created with "new" to be persistent. 
         // Not calling delete would therefore result in a memory leak
         delete[] args;
     }
 
-    void setNext(MyEvent* next)
+    void setNext(Event* next)
     {
         this->next = next;
     }
 
-    MyEvent* getNext()
+    Event* getNext()
     {
         return this->next; 
     }
 
-    void setPrevious(MyEvent* previous)
+    void setPrevious(Event* previous)
     {
         this->previous = previous;
     }
 
-    MyEvent* getPrevious()
+    Event* getPrevious()
     {
         return this->previous; 
     }
 
-    unsigned long getWhen()
+    unsigned long getInvokeTime()
     {
-        return this->when;
+        return this->invokeTime;
     }
 
-    EventType getWhat()
+    EventType getEventType()
     {
-        return this->what;
+        return this->eventType;
     }
 
     int* getArguments()
