@@ -1,7 +1,6 @@
 #include <Adafruit_PWMServoDriver.h>
-#include <LiquidCrystal.h>
 #include "Event.h"
-#include "MenuElement.h"
+#include "Menu.h"
 #include <Encoder.h>
 #include "Enums.h"
 #include "MusicNotes.h"
@@ -28,10 +27,6 @@ int rightServosUpPositions[8] = {58, 58, 64, 65, 66, 62, 66, 66};
 bool leftServosUp[9];
 bool rightServosUp[8];
 
-String selectedPrefix = "> ";
-String emptyPrefix = "  ";
-bool wasLastdirectionUp = false;
-
 short currentArrayPosition;
 short currentArraySize;
 const unsigned char * currentNotesArray;
@@ -46,10 +41,7 @@ const PROGMEM char pipiTheme[] = "5,336;8,349;10,312;8,337;9,643;11,132;10,151;9
 const PROGMEM char pommerscheTheme[] = "5,612;8,529;8,474;8,458;7,427;9,527;8,474;5,514;10,385;12,412;12,412;12,412;11,405;10,420;9,794;11,474;13,460;13,621;12,204;11,183;10,404;12,348;12,353;10,372;9,345;11,381;11,352;10,133;9,192;10,315;11,364;12,667;11,378;13,329;13,200;12,438;11,198;10,312;12,394;12,259;13,361;12,609;12,313;12,306;12,385;13,334;14,427;15,0;";
 const PROGMEM char romanticFlight[] = "9,139;10,181;11,845;12,181;11,184;10,847;9,335;8,635;10,308;5,600;9,356;10,323;12,325;15,708;16,63;15,195;16,373;17,237;16,704;12,422;13,459;15,439;13,224;12,245;12,421;10,451;8,555;9,216;12,422;10,1088;5,214;6,185;6,1080;5,188;6,262;6,852;5,177;8,251;6,967;5,447;6,427;8,438;8,250;5,233;8,197;9,232;7,227;5,272;7,178;8,268;6,213;5,276;5,196;4,248;4,220;3,244;2,238;1,182;8,251;5,185;8,245;9,250;7,192;5,263;7,132;8,310;6,231;5,291;5,128;4,232;4,181;3,217;2,219;1,222;3,885;4,672;2,252;2,269;3,167;4,242;3,243;3,1000;3,454;4,766;2,189;2,288;3,119;4,249;3,253;3,963;6,477;6,402;7,492;7,424;6,229;5,252;3,1049;6,435;6,425;7,440;7,424;6,221;5,210;8,874;8,871;9,619;10,282;10,400;5,399;10,407;12,454;9,596;10,103;9,208;10,556;10,182;13,190;12,253;10,435;10,240;10,186;9,413;9,184;10,295;6,367;6,285;7,115;8,501;8,159;9,220;8,283;7,438;6,70;5,184;6,768;8,316;8,194;5,232;8,229;9,223;7,218;5,285;7,192;8,266;6,252;5,252;5,221;4,278;4,183;3,257;2,221;1,163;8,270;5,214;8,262;9,258;7,214;5,264;7,290;8,294;6,311;5,307;5,289;4,332;4,360;3,405;2,637;1,1000;";
 
-const char notesArrayText[][13] = {"Play Note 1", "Play Note 2", "Play Note 3", "Play Note 4", 
-    "Play Note 5", "Play Note 6", "Play Note 7", "Play Note 8", "Play Note 9", 
-    "Play Note 10", "Play Note 11", "Play Note 12", "Play Note 13", "Play Note 14", 
-    "Play Note 15", "Play Note 16", "Play Note 17"};
+
 
 int totalNotesPlayed = 0;
 unsigned long lastEventDue = 0;
@@ -62,28 +54,9 @@ char serialInputBuffer [100];
 Event* headNode;
 Event* nodeToDelete;
 
-// Create the menu items
-MenuElement* currentMenu;
 
-MenuElement* mainMenu1 = new MenuElement((char *)"Play Notes", SetMenu, NotesMenu);
-MenuElement* mainMenu2 = new MenuElement((char *)"Play Songs", SetMenu, SongMenu);
 
-MenuElement* mainMenu3 = new MenuElement((char *)"Init All Up", Init, Up);
-MenuElement* mainMenu4 = new MenuElement((char *)"Init All Down", Init, Down);
-MenuElement* mainMenu5 = new MenuElement((char *)"Init All Center", Init, Center);
-MenuElement* mainMenu6 = new MenuElement((char *)"Buzzer is Off", ToggleBuzzer, 0);
 
-MenuElement* songMenu1 = new MenuElement((char *)"Age of Empires",PlaySong, AgeOfEmpiresTheme);
-MenuElement* songMenu2 = new MenuElement((char *)"Luxebourg Anth.",PlaySong, LuxembourgAnthem);
-MenuElement* songMenu3 = new MenuElement((char *)"Pipi Theme",PlaySong, PipiTheme);
-MenuElement* songMenu4 = new MenuElement((char *)"Pommersche",PlaySong, PommerscheTheme);
-MenuElement* songMenu5 = new MenuElement((char *)"Romantic Flight",PlaySong, RomanticFlight);
-MenuElement* songMenuBack = new MenuElement((char *)"Back", SetMenu, MainMenu);
-
-MenuElement* notesMenu[17];
-
-// Prepare the LCD
-LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
 
 // Prepare the encoder
 const int PinSW = 4;
@@ -192,18 +165,6 @@ void generateEventsFromPROGMEM(const char * startChar)
             buffer[bufferIndex] = c;
             bufferIndex++;
         }
-    }
-}
-
-void preparePrintMenuToLCD()
-{
-    if (wasLastdirectionUp)
-    {
-        printToLCD(currentMenu->caption, currentMenu->bottomNeighbour->caption, 0);
-    }
-    else
-    {
-        printToLCD(currentMenu->topNeighbour->caption, currentMenu->caption, 1);
     }
 }
 
@@ -567,56 +528,8 @@ void processNotesArray()
     }
 }
 
-void clearLCDLine(int line)
-{               
-    lcd.setCursor(0, line);
 
-    for(int n = 0; n < 16; n++) 
-    {
-        lcd.print(" ");
-    }
-}
 
-void printToLCD(String firstLine, String secondLine, int selectedLine)
-{
-    String upperLine;
-    String lowerLine;
-
-    if (selectedLine == 0)
-    {
-        upperLine = selectedPrefix;
-        upperLine.concat(firstLine);
-
-        lowerLine = emptyPrefix;
-        lowerLine.concat(secondLine);
-    }
-    else if (selectedLine == 1)
-    {
-        upperLine = emptyPrefix;
-        upperLine.concat(firstLine);
-
-        lowerLine = selectedPrefix;
-        lowerLine.concat(secondLine);
-    }
-    else
-    {
-        upperLine = emptyPrefix;
-        upperLine.concat(firstLine);
-
-        lowerLine = emptyPrefix;
-        lowerLine.concat(secondLine);
-    }
-
-    // Clear LCD
-    clearLCDLine(0);
-    clearLCDLine(1);
-
-    // Print lines to lcd
-    lcd.setCursor(0, 0);
-    lcd.print(upperLine);
-    lcd.setCursor(0, 1);
-    lcd.print(lowerLine);
-}
 
 void createEventFromStr(char input[])
 {
@@ -665,79 +578,14 @@ void setup()
     pinMode(PinSW,INPUT);
     digitalWrite(PinSW, HIGH);
 
-    // Initialize lcd with size
-    lcd.begin(16, 2);
-
-    clearLCDLine(0);
-    clearLCDLine(1);
+    initializeLcd();
+    initializeMenu();
 
     // Move all servos to defined positions
     Serial.println("Initialize Up");
     moveAllServosUp();
 
-    // Link the main menu items
-    mainMenu1->topNeighbour = mainMenu6;
-    mainMenu1->bottomNeighbour = mainMenu2;
 
-    mainMenu2->topNeighbour = mainMenu1;
-    mainMenu2->bottomNeighbour = mainMenu3;
-
-    mainMenu3->topNeighbour = mainMenu2;
-    mainMenu3->bottomNeighbour = mainMenu4;
-
-    mainMenu4->topNeighbour = mainMenu3;
-    mainMenu4->bottomNeighbour = mainMenu5;
-
-    mainMenu5->topNeighbour = mainMenu4;
-    mainMenu5->bottomNeighbour = mainMenu6;
-
-    mainMenu6->topNeighbour = mainMenu5;
-    mainMenu6->bottomNeighbour = mainMenu1;
-
-    // Link the song menu items
-    songMenu1->topNeighbour = songMenuBack;
-    songMenu1->bottomNeighbour = songMenu2;
-
-    songMenu2->topNeighbour = songMenu1;
-    songMenu2->bottomNeighbour = songMenu3;
-
-    songMenu3->topNeighbour = songMenu2;
-    songMenu3->bottomNeighbour = songMenu4; 
-
-    songMenu4->topNeighbour = songMenu3;
-    songMenu4->bottomNeighbour = songMenu5;  
-
-    songMenu5->topNeighbour = songMenu4;
-    songMenu5->bottomNeighbour = songMenuBack;
-
-    songMenuBack->topNeighbour = songMenu5;
-    songMenuBack->bottomNeighbour = songMenu1;   
-
-    // Create all the entries for the notes Menu
-    for (int i = 0; i < 17; i++)
-    {
-        notesMenu[i] = new MenuElement((char *)notesArrayText[i], PlayNote, i + 1);
-    }
-
-    // Link all the inner notes menu items togeather
-    for (int i = 1; i < 16; i++)
-    {
-        notesMenu[i]->topNeighbour = notesMenu[i - 1];
-        notesMenu[i]->bottomNeighbour = notesMenu[i + 1];
-    }
-
-    // Link all the extreme notes menu items togeather
-    notesMenu[0]->topNeighbour = notesMenu[16];
-    notesMenu[0]->bottomNeighbour = notesMenu[1];
-
-    notesMenu[16]->topNeighbour = notesMenu[15];
-    notesMenu[16]->bottomNeighbour = notesMenu[0];
-
-    // Set entry node of menu
-    currentMenu = mainMenu1;
-
-    // Output menu 
-    printToLCD(currentMenu->caption, currentMenu->bottomNeighbour->caption, 0);
 
     Serial.setTimeout(5000);
 }
