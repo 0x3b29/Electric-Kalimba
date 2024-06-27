@@ -105,17 +105,9 @@ void loop()
         }
         else if (serialInputBuffer[0] == 'b')
         {
-            if (isBuzzerEnabled)
-            {
-                mainMenu6->setCaption((char *)"Buzzer is Off");
-            }
-            else
-            {
-                mainMenu6->setCaption((char *)"Buzzer is On");
-            }
-
-            preparePrintMenuToLCD();
             isBuzzerEnabled = !isBuzzerEnabled;
+            setBuzzerMenuItem(isBuzzerEnabled);
+            preparePrintMenuToLCD();
         }
         else if (serialInputBuffer[0] == 'm')
         {

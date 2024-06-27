@@ -8,7 +8,7 @@ enum EventType
     SetMenu,
     Init,
     PlaySong,
-    ToggleBuzzer,
+    ToggleBuzzer
 };
 
 enum InitOption

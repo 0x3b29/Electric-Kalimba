@@ -120,11 +120,11 @@ void parseEvent(EventType eventType, int *args)
         }
         else if (args[0] == SongMenu)
         {
-            currentMenu = songMenu1;
+            currentMenu = songMenu[0];
         }
         else if (args[0] == MainMenu)
         {
-            currentMenu = mainMenu1;
+            currentMenu = mainMenu[0];
         }
 
         printToLCD(currentMenu->caption, currentMenu->bottomNeighbour->caption, 0);
@@ -146,18 +146,9 @@ void parseEvent(EventType eventType, int *args)
         break;
 
     case ToggleBuzzer:
-        if (isBuzzerEnabled)
-        {
-            mainMenu6->setCaption((char *)"Buzzer is Off");
-        }
-        else
-        {
-            mainMenu6->setCaption((char *)"Buzzer is On");
-        }
-
-        preparePrintMenuToLCD();
         isBuzzerEnabled = !isBuzzerEnabled;
-
+        setBuzzerMenuItem(isBuzzerEnabled);
+        preparePrintMenuToLCD();
         break;
 
     case PlaySong:
