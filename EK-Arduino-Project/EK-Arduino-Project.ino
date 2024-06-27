@@ -1,10 +1,11 @@
 
 #include "EventManager.h"
 #include "Menu.h"
-#include <Encoder.h>
 #include "Enums.h"
 #include "Servo.h"
 #include "Music.h"
+#include "Memory.h"
+#include <Encoder.h>
 #include "Adafruit_Debounce.h"
 
 int bufferPosition;
@@ -21,24 +22,6 @@ int oldEncoderDiv4Value = 0;
 int lastEncoderDiv4ButtonPressedValue = 0;
 unsigned long millisLastEncodeButtonPressed = 0;
 bool freshButtonPressed = false;
-
-#ifdef __arm__
-// should use uinstd.h to define sbrk but Due causes a conflict
-extern "C" char* sbrk(int incr);
-#else  // __ARM__
-extern char *__brkval;
-#endif  // __arm__
-
-int freeMemory() {
-  char top;
-#ifdef __arm__
-  return &top - reinterpret_cast<char*>(sbrk(0));
-#elif defined(CORE_TEENSY) || (ARDUINO > 103 && ARDUINO != 151)
-  return &top - __brkval;
-#else  // __arm__
-  return __brkval ? &top - __brkval : &top - __malloc_heap_start;
-#endif  // __arm__
-}
 
 void setup() 
 {
@@ -104,7 +87,7 @@ void loop()
                 wasLastdirectionUp = false;
             }
 
-            preparePrintMenuToLCD();
+            preparePrintMenuToLCD(); 
 
             oldEncoderDiv4Value = newEncoderDiv4Value;
         }
@@ -112,9 +95,8 @@ void loop()
 
     // Check if rotary encoder got pressed
     // Also check if encoder state has changed which is important for selecting multiple things in a row (e.g. different notes)
-
-
-    if (encoderButton.justPressed()) {
+    if (encoderButton.justPressed()) 
+    {
       freshButtonPressed = true;
       millisLastEncodeButtonPressed = millis();
       lastEncoderDiv4ButtonPressedValue = newEncoderDiv4Value;
@@ -175,7 +157,9 @@ void loop()
         {
             isValidCommand = true;
             serialInputBuffer[bufferPosition] = '\0';
-        }else if (serialChar > 40 && serialChar < 127) {
+        }
+        else if (serialChar > 40 && serialChar < 127) 
+        {
             serialInputBuffer[bufferPosition] = serialChar;
             bufferPosition++;
         }
@@ -244,6 +228,10 @@ Serial.println (serialInputBuffer[0]);
 
             preparePrintMenuToLCD();
             isBuzzerEnabled = !isBuzzerEnabled;
+        }
+        else if (serialInputBuffer[0] == 'm')
+        {
+            freeMemory();
         }
         else
         {
