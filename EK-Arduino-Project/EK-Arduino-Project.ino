@@ -4,7 +4,7 @@
 #include "MenuElement.h"
 #include <Encoder.h>
 #include "MyEnums.h"
-#include "MyNotes.h"
+#include "MusicNotes.h"
 #include "Adafruit_Debounce.h"
 
 Adafruit_PWMServoDriver leftServoBoard = Adafruit_PWMServoDriver(0x40);    //Create an object of board 1
