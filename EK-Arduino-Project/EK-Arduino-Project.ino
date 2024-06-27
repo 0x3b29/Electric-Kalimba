@@ -101,12 +101,7 @@ void loop()
         else if (serialInputBuffer[0] == 'x')
         {
             Serial.println("Xing ...");
-            for (int i = 1; i <= 17; i++)
-            {
-                int *args = new int[1];
-                args[0] = i;
-                addEvent(new Event(millis() + (i * 250), PlayNote, args));
-            }
+            playStairs();
         }
         else if (serialInputBuffer[0] == 'b')
         {

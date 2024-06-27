@@ -11,13 +11,14 @@ bool wasLastdirectionUp = false;
 // Create the menu items
 MenuElement *currentMenu;
 
-MenuElement *mainMenu1 = new MenuElement((char *)"Play Notes", SetMenu, NotesMenu);
-MenuElement *mainMenu2 = new MenuElement((char *)"Play Songs", SetMenu, SongMenu);
+MenuElement *mainMenu1 = new MenuElement((char *)"Play Songs", SetMenu, SongMenu);
+MenuElement *mainMenu2 = new MenuElement((char *)"Play Notes", SetMenu, NotesMenu);
+MenuElement *mainMenu3 = new MenuElement((char *)"Play Stair", PlaySong, Stairs);
 
-MenuElement *mainMenu3 = new MenuElement((char *)"Init All Up", Init, Up);
-MenuElement *mainMenu4 = new MenuElement((char *)"Init All Down", Init, Down);
-MenuElement *mainMenu5 = new MenuElement((char *)"Init All Center", Init, Center);
-MenuElement *mainMenu6 = new MenuElement((char *)"Buzzer is Off", ToggleBuzzer, 0);
+MenuElement *mainMenu4 = new MenuElement((char *)"Init All Up", Init, Up);
+MenuElement *mainMenu5 = new MenuElement((char *)"Init All Down", Init, Down);
+MenuElement *mainMenu6 = new MenuElement((char *)"Init All Center", Init, Center);
+MenuElement *mainMenu7 = new MenuElement((char *)"Buzzer is Off", ToggleBuzzer, 0);
 
 MenuElement *songMenu1 = new MenuElement((char *)"Age of Empires", PlaySong, AgeOfEmpiresTheme);
 MenuElement *songMenu2 = new MenuElement((char *)"Luxebourg Anth.", PlaySong, LuxembourgAnthem);
@@ -106,7 +107,7 @@ void preparePrintMenuToLCD()
 void initializeMenu()
 {
     // Link the main menu items
-    mainMenu1->topNeighbour = mainMenu6;
+    mainMenu1->topNeighbour = mainMenu7;
     mainMenu1->bottomNeighbour = mainMenu2;
 
     mainMenu2->topNeighbour = mainMenu1;
@@ -122,7 +123,10 @@ void initializeMenu()
     mainMenu5->bottomNeighbour = mainMenu6;
 
     mainMenu6->topNeighbour = mainMenu5;
-    mainMenu6->bottomNeighbour = mainMenu1;
+    mainMenu6->bottomNeighbour = mainMenu7;
+
+    mainMenu7->topNeighbour = mainMenu6;
+    mainMenu7->bottomNeighbour = mainMenu1;
 
     // Link the song menu items
     songMenu1->topNeighbour = songMenuBack;

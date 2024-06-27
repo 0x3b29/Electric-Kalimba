@@ -6,6 +6,7 @@
 void playNote(int note);
 void buzzerNote(int note);
 void processNotesArray();
+void playStairs();
 
 extern int totalNotesPlayed;
 extern unsigned long millisLastNotePlayed;

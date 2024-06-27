@@ -161,7 +161,11 @@ void parseEvent(EventType eventType, int *args)
         break;
 
     case PlaySong:
-        if (args[0] == AgeOfEmpiresTheme)
+        if (args[0] == Stairs)
+        {
+            playStairs();
+        }
+        else if (args[0] == AgeOfEmpiresTheme)
         {
             generateEventsFromPROGMEM(ageOfEmpires);
         }

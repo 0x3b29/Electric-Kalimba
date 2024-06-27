@@ -27,6 +27,7 @@ enum MenuOptions
 
 enum Song
 {
+    Stairs,
     LuxembourgAnthem,
     AgeOfEmpiresTheme,
     PipiTheme,
