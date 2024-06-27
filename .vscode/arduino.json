@@ -1,0 +1,8 @@
+{
+  "configuration": "cpu=atmega2560",
+  "board": "arduino:avr:mega",
+  "port": "COM23",
+  "programmer": "avrispmkii",
+  "sketch": "EK-Arduino-Project\\EK-Arduino-Project.ino",
+  "output": "./.output"
+}
