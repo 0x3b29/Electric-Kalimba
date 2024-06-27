@@ -182,9 +182,9 @@ void parseEvent(EventType eventType, int *args)
         {
             generateEventsFromPROGMEM(pommerscheTheme);
         }
-        else if (args[0] == RomanticFlight)
+        else if (args[0] == HttydImpro)
         {
-            generateEventsFromPROGMEM(romanticFlight);
+            generateEventsFromPROGMEM(httydImpro);
         }
         break;
 

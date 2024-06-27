@@ -23,7 +23,7 @@ MenuElement *songMenu1 = new MenuElement((char *)"Age of Empires", PlaySong, Age
 MenuElement *songMenu2 = new MenuElement((char *)"Luxebourg Anth.", PlaySong, LuxembourgAnthem);
 MenuElement *songMenu3 = new MenuElement((char *)"Pipi Theme", PlaySong, PipiTheme);
 MenuElement *songMenu4 = new MenuElement((char *)"Pommersche", PlaySong, PommerscheTheme);
-MenuElement *songMenu5 = new MenuElement((char *)"Romantic Flight", PlaySong, RomanticFlight);
+MenuElement *songMenu5 = new MenuElement((char *)"HTTYD Impro", PlaySong, HttydImpro);
 MenuElement *songMenuBack = new MenuElement((char *)"Back", SetMenu, MainMenu);
 
 MenuElement *notesMenu[17];

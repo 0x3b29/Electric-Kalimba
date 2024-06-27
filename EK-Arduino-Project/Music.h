@@ -14,7 +14,7 @@ extern bool isBuzzerEnabled;
 extern const PROGMEM char ageOfEmpires[];
 extern const PROGMEM char pipiTheme[];
 extern const PROGMEM char pommerscheTheme[];
-extern const PROGMEM char romanticFlight[];
+extern const PROGMEM char httydImpro[];
 
 extern short currentArrayPosition;
 extern short currentArraySize;
