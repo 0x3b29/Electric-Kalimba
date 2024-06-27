@@ -1,7 +1,7 @@
 #include <Adafruit_PWMServoDriver.h>
 #include <LiquidCrystal.h>
 #include "MyEvent.h"
-#include "MyMenu.h"
+#include "MenuElement.h"
 #include <Encoder.h>
 #include "MyEnums.h"
 #include "MyNotes.h"
@@ -63,24 +63,24 @@ MyEvent* headNode;
 MyEvent* nodeToDelete;
 
 // Create the menu items
-MyMenu* currentMenu;
+MenuElement* currentMenu;
 
-MyMenu* mainMenu1 = new MyMenu((char *)"Play Notes", SetMenu, NotesMenu);
-MyMenu* mainMenu2 = new MyMenu((char *)"Play Songs", SetMenu, SongMenu);
+MenuElement* mainMenu1 = new MenuElement((char *)"Play Notes", SetMenu, NotesMenu);
+MenuElement* mainMenu2 = new MenuElement((char *)"Play Songs", SetMenu, SongMenu);
 
-MyMenu* mainMenu3 = new MyMenu((char *)"Init All Up", Init, Up);
-MyMenu* mainMenu4 = new MyMenu((char *)"Init All Down", Init, Down);
-MyMenu* mainMenu5 = new MyMenu((char *)"Init All Center", Init, Center);
-MyMenu* mainMenu6 = new MyMenu((char *)"Buzzer is Off", ToggleBuzzer, 0);
+MenuElement* mainMenu3 = new MenuElement((char *)"Init All Up", Init, Up);
+MenuElement* mainMenu4 = new MenuElement((char *)"Init All Down", Init, Down);
+MenuElement* mainMenu5 = new MenuElement((char *)"Init All Center", Init, Center);
+MenuElement* mainMenu6 = new MenuElement((char *)"Buzzer is Off", ToggleBuzzer, 0);
 
-MyMenu* songMenu1 = new MyMenu((char *)"Age of Empires",PlaySong, AgeOfEmpiresTheme);
-MyMenu* songMenu2 = new MyMenu((char *)"Luxebourg Anth.",PlaySong, LuxembourgAnthem);
-MyMenu* songMenu3 = new MyMenu((char *)"Pipi Theme",PlaySong, PipiTheme);
-MyMenu* songMenu4 = new MyMenu((char *)"Pommersche",PlaySong, PommerscheTheme);
-MyMenu* songMenu5 = new MyMenu((char *)"Romantic Flight",PlaySong, RomanticFlight);
-MyMenu* songMenuBack = new MyMenu((char *)"Back", SetMenu, MainMenu);
+MenuElement* songMenu1 = new MenuElement((char *)"Age of Empires",PlaySong, AgeOfEmpiresTheme);
+MenuElement* songMenu2 = new MenuElement((char *)"Luxebourg Anth.",PlaySong, LuxembourgAnthem);
+MenuElement* songMenu3 = new MenuElement((char *)"Pipi Theme",PlaySong, PipiTheme);
+MenuElement* songMenu4 = new MenuElement((char *)"Pommersche",PlaySong, PommerscheTheme);
+MenuElement* songMenu5 = new MenuElement((char *)"Romantic Flight",PlaySong, RomanticFlight);
+MenuElement* songMenuBack = new MenuElement((char *)"Back", SetMenu, MainMenu);
 
-MyMenu* notesMenu[17];
+MenuElement* notesMenu[17];
 
 // Prepare the LCD
 LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
@@ -716,7 +716,7 @@ void setup()
     // Create all the entries for the notes Menu
     for (int i = 0; i < 17; i++)
     {
-        notesMenu[i] = new MyMenu((char *)notesArrayText[i], PlayNote, i + 1);
+        notesMenu[i] = new MenuElement((char *)notesArrayText[i], PlayNote, i + 1);
     }
 
     // Link all the inner notes menu items togeather
