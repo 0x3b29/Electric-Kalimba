@@ -1,4 +1,4 @@
-#include "MyEnums.h"
+#include "Enums.h"
 class MenuElement
 {
     public: 

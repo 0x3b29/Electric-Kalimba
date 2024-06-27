@@ -1,5 +1,5 @@
-#ifndef MYENUMS_H
-#define MYENUMS_H
+#ifndef ENUMS_H
+#define ENUMS_H
     enum EventType
     {
         SetServoPosition,

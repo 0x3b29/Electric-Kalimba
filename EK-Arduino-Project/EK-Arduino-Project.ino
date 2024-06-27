@@ -3,7 +3,7 @@
 #include "MyEvent.h"
 #include "MenuElement.h"
 #include <Encoder.h>
-#include "MyEnums.h"
+#include "Enums.h"
 #include "MusicNotes.h"
 #include "Adafruit_Debounce.h"
 
