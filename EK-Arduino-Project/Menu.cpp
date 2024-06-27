@@ -1,4 +1,7 @@
 #include "Menu.h"
+#include <LiquidCrystal.h>
+
+
 // Prepare the LCD
 LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
 

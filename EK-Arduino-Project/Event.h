@@ -1,5 +1,8 @@
-#include "Enums.h"
+#ifndef EVENT_H
+#define EVENT_H
 
+#include "Arduino.h"
+#include "Enums.h"
 class Event
 {
     private:
@@ -67,3 +70,5 @@ class Event
         return this->args;
     }
 };
+
+#endif

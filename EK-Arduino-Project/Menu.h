@@ -2,7 +2,7 @@
 #define MENU_H
 
 #include "MenuElement.h"
-#include <LiquidCrystal.h>
+#include "Arduino.h"
 
 extern bool wasLastdirectionUp;
 // Create the menu items
@@ -25,12 +25,9 @@ extern MenuElement* songMenuBack ;
 
 extern MenuElement* notesMenu[];
 
-
-
 void initializeLcd();
-
+void initializeMenu();
 void printToLCD(String firstLine, String secondLine, int selectedLine);
 void clearLCDLine(int line);
 void preparePrintMenuToLCD();
-void initializeMenu();
 #endif 
