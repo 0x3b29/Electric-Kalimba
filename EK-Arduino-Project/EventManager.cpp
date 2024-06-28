@@ -1,4 +1,5 @@
 #include "EventManager.h"
+#include "Info.h"
 #include "Menu.h"
 #include "Music.h"
 #include "MusicNotes.h"
@@ -9,6 +10,7 @@ Event *nodeToDelete;
 
 unsigned long lastEventDue = 0;
 unsigned long lastOffset;
+unsigned long eventCounter = 0;
 
 void updateEventManager()
 {
@@ -23,7 +25,45 @@ void updateEventManager()
         headNode = headNode->getNext();
         delete nodeToDelete;
         nodeToDelete = NULL;
+        eventCounter++;
     }
+}
+
+uint8_t getNextNote()
+{
+    Event *event = headNode;
+
+    while (event != NULL)
+    {
+        if (event->getEventType() == PlayNote)
+        {
+            return event->getArguments()[0];
+        }
+        else
+        {
+            event = event->getNext();
+        }
+    }
+
+    return NO_NOTE;
+}
+
+uint16_t getRemainingNotesCount()
+{
+    uint16_t noteEventsCounter = 0;
+    Event *event = headNode;
+
+    while (event != NULL)
+    {
+        if (event->getEventType() == PlayNote)
+        {
+            noteEventsCounter++;
+        }
+
+        event = event->getNext();
+    }
+
+    return noteEventsCounter;
 }
 
 void emptyEventQueue()
@@ -131,20 +171,7 @@ void parseEvent(EventType eventType, int *args)
         break;
 
     case SetMenu:
-        if (args[0] == NotesMenu)
-        {
-            currentMenu = notesMenu[0];
-        }
-        else if (args[0] == SongMenu)
-        {
-            currentMenu = songMenu[0];
-        }
-        else if (args[0] == MainMenu)
-        {
-            currentMenu = mainMenu[0];
-        }
-
-        printToLCD(currentMenu->caption, currentMenu->bottomNeighbour->caption, 0);
+        setMenu(args[0]);
         break;
 
     case Init:

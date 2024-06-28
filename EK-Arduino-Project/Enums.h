@@ -10,6 +10,7 @@ enum EventType
     PlaySong,
     ToggleBuzzer,
     EmptyQueue,
+    Info,
 };
 
 enum InitOption
@@ -23,7 +24,8 @@ enum MenuOptions
 {
     MainMenu,
     NotesMenu,
-    SongMenu
+    SongMenu,
+    InfoMenu,
 };
 
 enum Song

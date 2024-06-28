@@ -3,12 +3,15 @@
 
 #include "Arduino.h"
 
-void playNote(int note);
-void buzzerNote(int note);
+#define NO_NOTE 255
+
+void playNote(uint8_t note);
+void buzzerNote(uint8_t note);
 void processNotesArray();
 void playStairs();
 
-extern int totalNotesPlayed;
+extern uint16_t totalNotesPlayed;
+extern uint8_t lastNotePlayed;
 extern unsigned long millisLastNotePlayed;
 extern bool isBuzzerEnabled;
 

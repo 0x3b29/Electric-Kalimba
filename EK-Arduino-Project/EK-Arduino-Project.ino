@@ -2,6 +2,7 @@
 #include "EncoderButton.h"
 #include "Enums.h"
 #include "EventManager.h"
+#include "Info.h"
 #include "Memory.h"
 #include "Menu.h"
 #include "Music.h"
@@ -29,6 +30,7 @@ void loop()
 {
     updateEncoderButton();
     updateEventManager();
+    updateInfo();
 
     bool didReadSomething = false;
     bool isValidCommand = false;

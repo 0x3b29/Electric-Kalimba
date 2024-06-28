@@ -2,6 +2,7 @@
 #include "Music.h"
 #include "Event.h"
 #include "EventManager.h"
+#include "Info.h"
 #include "MusicNotes.h"
 #include "Servo.h"
 
@@ -15,7 +16,8 @@ const unsigned short int *currentOffsetsArray;
 short currentArrayPosition;
 short currentArraySize;
 
-int totalNotesPlayed = 0;
+uint16_t totalNotesPlayed = 0;
+uint8_t lastNotePlayed = NO_NOTE;
 unsigned long millisLastNotePlayed = 0;
 
 short int luxembourgAnthemSize = 146;
@@ -57,9 +59,10 @@ const PROGMEM char httydImpro[] =
     "9,413;9,184;10,295;6,367;6,285;7,115;8,501;8,159;9,220;8,283;7,438;6,70;5,184;6,768;8,316;8,194;5,232;8,229;9,223;7,218;5,285;7,192;8,266;6,252;5,252;5,"
     "221;4,278;4,183;3,257;2,221;1,163;8,270;5,214;8,262;9,258;7,214;5,264;7,290;8,294;6,311;5,307;5,289;4,332;4,360;3,405;2,637;1,1000;";
 
-void playNote(int note)
+void playNote(uint8_t note)
 {
     totalNotesPlayed++;
+    lastNotePlayed = note;
 
     switch (note)
     {
@@ -163,7 +166,7 @@ void playNote(int note)
     millisLastNotePlayed = millisCurrentNote;
 }
 
-void buzzerNote(int note)
+void buzzerNote(uint8_t note)
 {
     if (isBuzzerEnabled)
     {
