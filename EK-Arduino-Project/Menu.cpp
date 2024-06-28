@@ -21,6 +21,7 @@ const MenuElement *songMenu[] = {new MenuElement((char *)"Age of Empires", PlayS
                                  new MenuElement((char *)"Pipi Theme", PlaySong, PipiTheme),
                                  new MenuElement((char *)"Pommersche", PlaySong, PommerscheTheme),
                                  new MenuElement((char *)"HTTYD Impro", PlaySong, HttydImpro),
+                                 new MenuElement((char *)">> Stop All <<", EmptyQueue, 0),
                                  new MenuElement((char *)"Back", SetMenu, MainMenu)};
 
 const MenuElement *notesMenu[17];

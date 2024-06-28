@@ -26,6 +26,23 @@ void updateEventManager()
     }
 }
 
+void emptyEventQueue()
+{
+    Event *previousNode = NULL;
+    Event *currentNode = headNode;
+
+    while (currentNode != NULL)
+    {
+        previousNode = currentNode;
+        currentNode = currentNode->getNext();
+
+        delete previousNode;
+    }
+
+    headNode = NULL;
+    lastEventDue = 0;
+}
+
 void addEvent(Event *newEvent)
 {
     Event *previousNode = NULL;
@@ -187,6 +204,10 @@ void parseEvent(EventType eventType, int *args)
         processNotesArray();
         break;
 
+    case EmptyQueue:
+        emptyEventQueue();
+        break;
+
     default:
         break;
     }
@@ -194,24 +215,32 @@ void parseEvent(EventType eventType, int *args)
 
 void createEventFromStr(char input[])
 {
+    // Search for position of ','
     char *commaPos = strchr(input, ',');
+
+    // Replace ',' with string termination
     *commaPos = 0;
 
+    // Create int array to store all args inside (here only one)
     int *args = new int[1];
     args[0] = atoi(input);
 
+    // Shift the pointer from the Null terminator to start of the notes offset
     ++commaPos;
 
+    // Parse the notes offset
     unsigned long offset = atoi(commaPos);
 
     if (lastEventDue >= millis())
     {
+        // Last event has not yet happened
         addEvent(new Event((lastEventDue + lastOffset), PlayNote, args));
         lastEventDue = lastEventDue + lastOffset;
         lastOffset = offset;
     }
     else
     {
+        // Last event is over
         addEvent(new Event((millis() + 250), PlayNote, args));
         lastEventDue = millis() + 250;
         lastOffset = offset;
