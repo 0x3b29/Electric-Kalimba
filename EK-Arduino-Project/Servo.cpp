@@ -12,13 +12,15 @@ int servoFrequency = 50; // Servo update frequency, analog servos typically run 
 int servoTravelTime = 150;
 int servoRelaxAmount = 20;
 
-int leftServosUpPositions[9] = {110, 105, 105, 105, 110, 110, 110, 110, 110};
-int board1ServoCenterPos[9] = {80, 80, 80, 85, 85, 85, 85, 85, 85};
-int leftServosDownPositions[9] = {45, 45, 45, 47, 48, 49, 50, 50, 50};
+// Left side servos work as expected, lower numbers = lower down
+int leftServosUpPositions[9] = {105, 100, 100, 100, 105, 105, 105, 105, 105};
+int board1ServoCenterPos[9] = {75, 75, 75, 80, 80, 80, 80, 80, 80};
+int leftServosDownPositions[9] = {40, 40, 40, 42, 43, 44, 45, 45, 45};
 
-int rightServosDownPositions[8] = {120, 120, 120, 122, 124, 126, 128, 130};
-int board2ServoCenterPos[8] = {85, 85, 87, 90, 91, 92, 93, 94};
-int rightServosUpPositions[8] = {58, 58, 64, 65, 66, 62, 66, 66};
+// Right side servos work in opposite directions, bigger numbers = lower down
+int rightServosDownPositions[8] = {125, 125, 125, 127, 129, 131, 133, 135};
+int board2ServoCenterPos[8] = {90, 90, 92, 95, 96, 97, 98, 99};
+int rightServosUpPositions[8] = {63, 63, 69, 70, 71, 67, 71, 71};
 
 bool leftServosUp[9];
 bool rightServosUp[8];
