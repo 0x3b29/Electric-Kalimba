@@ -166,7 +166,7 @@ void playNote(uint8_t note)
     millisLastNotePlayed = millisCurrentNote;
 }
 
-void buzzerNote(uint8_t note)
+void buzzerNote(uint16_t note)
 {
     if (isBuzzerEnabled)
     {
