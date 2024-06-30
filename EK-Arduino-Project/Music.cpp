@@ -154,14 +154,16 @@ void playNote(uint8_t note)
 
     long millisCurrentNote = millis();
 
-    Serial.print("ms: ");
-    Serial.print(millisCurrentNote);
-    Serial.print(" diff: ");
-    Serial.print(millisCurrentNote - millisLastNotePlayed);
-    Serial.print(" Note: ");
-    Serial.print(note);
-    Serial.print(" Total: ");
-    Serial.println(totalNotesPlayed);
+    /*
+        Serial.print("ms: ");
+        Serial.print(millisCurrentNote);
+        Serial.print(" diff: ");
+        Serial.print(millisCurrentNote - millisLastNotePlayed);
+        Serial.print(" Note: ");
+        Serial.print(note);
+        Serial.print(" Total: ");
+        Serial.println(totalNotesPlayed);
+    */
 
     millisLastNotePlayed = millisCurrentNote;
 }
@@ -193,8 +195,7 @@ void playStairs()
 {
     for (int i = 1; i <= 17; i++)
     {
-        int *args = new int[1];
-        args[0] = i;
-        addEvent(new Event(millis() + (i * 250), PlayNote, args));
+        EventArg *eventArgs = new EventArg[1]{EventArg(i)};
+        addEvent(new Event(millis() + (i * 250), PlayNote, eventArgs));
     }
 }

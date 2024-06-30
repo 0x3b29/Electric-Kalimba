@@ -1,4 +1,5 @@
 #include "Servo.h"
+#include "Event.h"
 #include "EventManager.h"
 #include <Adafruit_PWMServoDriver.h>
 
@@ -72,13 +73,10 @@ void moveServoDown(int board, int servo)
 
     setServoPosition(board, servo, map(servoDownPosition, 0, 180, servoMin, servoMax));
 
-    int *args = new int[3];
+    EventArg *eventArgs =
+        new EventArg[3]{EventArg(board), EventArg(servo), EventArg(map(servoDownPosition + servoRelaxAmountToAdd, 0, 180, servoMin, servoMax))};
 
-    args[0] = board;
-    args[1] = servo;
-    args[2] = map(servoDownPosition + servoRelaxAmountToAdd, 0, 180, servoMin, servoMax);
-
-    addEvent(new Event(millis() + servoTravelTime, SetServoPosition, args));
+    addEvent(new Event(millis() + servoTravelTime, SetServoPosition, eventArgs));
 }
 
 void moveServoUp(int board, int servo)
@@ -101,13 +99,9 @@ void moveServoUp(int board, int servo)
 
     setServoPosition(board, servo, map(servoUpPosition, 0, 180, servoMin, servoMax));
 
-    int *args = new int[3];
+    EventArg *eventArgs = new EventArg[3]{EventArg(board), EventArg(servo), EventArg(map(servoUpPosition + servoRelaxAmountToAdd, 0, 180, servoMin, servoMax))};
 
-    args[0] = board;
-    args[1] = servo;
-    args[2] = map(servoUpPosition + servoRelaxAmountToAdd, 0, 180, servoMin, servoMax);
-
-    addEvent(new Event(millis() + servoTravelTime, SetServoPosition, args));
+    addEvent(new Event(millis() + servoTravelTime, SetServoPosition, eventArgs));
 }
 
 void toggleServo(int board, int servo)

@@ -8,6 +8,7 @@ enum EventType
     SetMenu,
     Init,
     PlaySong,
+    BufferMoreNotes,
     ToggleBuzzer,
     EmptyQueue,
     Info,

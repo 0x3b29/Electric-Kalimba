@@ -8,7 +8,7 @@ extern Event *nodeToDelete;
 void updateEventManager();
 
 void addEvent(Event *newEvent);
-void parseEvent(EventType what, int *args);
+void parseEvent(EventType what, EventArg *eventArgs);
 void generateEventsFromPROGMEM(const char *startChar);
 void createEventFromStr(char input[]);
 

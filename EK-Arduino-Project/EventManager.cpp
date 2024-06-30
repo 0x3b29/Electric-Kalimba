@@ -37,7 +37,7 @@ uint8_t getNextNote()
     {
         if (event->getEventType() == PlayNote)
         {
-            return event->getArguments()[0];
+            return event->getArguments()[0].intValue;
         }
         else
         {
@@ -137,17 +137,28 @@ void addEvent(Event *newEvent)
 void generateEventsFromPROGMEM(const char *startChar)
 {
     char c;
-    const char *currentChar = startChar;
+    char *currentChar = startChar;
 
     char buffer[10];
     int bufferIndex = 0;
 
-    while ((c = pgm_read_byte(currentChar++)))
+    int eventCounter = 0;
+    const int maxEventCounter = 100;
+
+    while (eventCounter < maxEventCounter)
     {
+        c = pgm_read_byte(currentChar);
+
+        if (c == NULL)
+        {
+            break;
+        }
+
         if (c == ';')
         {
             buffer[bufferIndex] = '\0';
             createEventFromStr(buffer);
+            eventCounter++;
             bufferIndex = 0;
         }
         else
@@ -155,35 +166,44 @@ void generateEventsFromPROGMEM(const char *startChar)
             buffer[bufferIndex] = c;
             bufferIndex++;
         }
+
+        currentChar++;
+    }
+
+    if (eventCounter >= maxEventCounter)
+    {
+        Serial.println("Found more events than maxEventCounter, added Buffer operation.");
+        EventArg *eventArgs = new EventArg[1]{EventArg(currentChar)};
+        addEvent(new Event(lastEventDue + lastOffset, BufferMoreNotes, eventArgs));
     }
 }
 
-void parseEvent(EventType eventType, int *args)
+void parseEvent(EventType eventType, EventArg *eventArgs)
 {
     switch (eventType)
     {
     case SetServoPosition:
-        setServoPosition(args[0], args[1], args[2]);
+        setServoPosition(eventArgs[0].intValue, eventArgs[1].intValue, eventArgs[2].intValue);
         break;
 
     case PlayNote:
-        playNote(args[0]);
+        playNote(eventArgs[0].intValue);
         break;
 
     case SetMenu:
-        setMenu(args[0]);
+        setMenu(eventArgs[0].intValue);
         break;
 
     case Init:
-        if (args[0] == Up)
+        if (eventArgs[0].intValue == Up)
         {
             moveAllServosUp();
         }
-        else if (args[0] == Down)
+        else if (eventArgs[0].intValue == Down)
         {
             moveAllServosDown();
         }
-        else if (args[0] == Center)
+        else if (eventArgs[0].intValue == Center)
         {
             moveAllServosCenter();
         }
@@ -196,15 +216,15 @@ void parseEvent(EventType eventType, int *args)
         break;
 
     case PlaySong:
-        if (args[0] == Stairs)
+        if (eventArgs[0].intValue == Stairs)
         {
             playStairs();
         }
-        else if (args[0] == AgeOfEmpiresTheme)
+        else if (eventArgs[0].intValue == AgeOfEmpiresTheme)
         {
             generateEventsFromPROGMEM(ageOfEmpires);
         }
-        else if (args[0] == LuxembourgAnthem)
+        else if (eventArgs[0].intValue == LuxembourgAnthem)
         {
             currentArrayPosition = 0;
             currentArraySize = luxembourgAnthemSize;
@@ -213,18 +233,34 @@ void parseEvent(EventType eventType, int *args)
 
             processNotesArray();
         }
-        else if (args[0] == PipiTheme)
+        else if (eventArgs[0].intValue == PipiTheme)
         {
             generateEventsFromPROGMEM(pipiTheme);
         }
-        else if (args[0] == PommerscheTheme)
+        else if (eventArgs[0].intValue == PommerscheTheme)
         {
             generateEventsFromPROGMEM(pommerscheTheme);
         }
-        else if (args[0] == HttydImpro)
+        else if (eventArgs[0].intValue == HttydImpro)
         {
             generateEventsFromPROGMEM(httydImpro);
         }
+        else if (eventArgs[0].intValue == HttydYt)
+        {
+            generateEventsFromPROGMEM(httydYt);
+        }
+        else if (eventArgs[0].intValue == InterstellardYt)
+        {
+            generateEventsFromPROGMEM(interstellarYt);
+        }
+        else
+        {
+            Serial.println("Tried to play undefined song!");
+        }
+        break;
+
+    case BufferMoreNotes:
+        generateEventsFromPROGMEM(eventArgs[0].ptrValue);
         break;
 
     case ProcessCurrentArray:
@@ -248,28 +284,26 @@ void createEventFromStr(char input[])
     // Replace ',' with string termination
     *commaPos = 0;
 
-    // Create int array to store all args inside (here only one)
-    int *args = new int[1];
-    args[0] = atoi(input);
+    EventArg *eventArgs = new EventArg[1]{EventArg(atoi(input))};
 
     // Shift the pointer from the Null terminator to start of the notes offset
     ++commaPos;
 
     // Parse the notes offset
-    unsigned long offset = atoi(commaPos);
+    int offset = atoi(commaPos);
 
     if (lastEventDue >= millis())
     {
         // Last event has not yet happened
-        addEvent(new Event((lastEventDue + lastOffset), PlayNote, args));
+        addEvent(new Event((lastEventDue + lastOffset), PlayNote, eventArgs));
         lastEventDue = lastEventDue + lastOffset;
         lastOffset = offset;
     }
     else
     {
         // Last event is over
-        addEvent(new Event((millis() + 250), PlayNote, args));
-        lastEventDue = millis() + 250;
+        addEvent(new Event((millis()), PlayNote, eventArgs));
+        lastEventDue = millis();
         lastOffset = offset;
     }
 }

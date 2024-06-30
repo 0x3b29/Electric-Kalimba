@@ -11,22 +11,26 @@ bool wasLastdirectionUp = false;
 // Create the menu items
 MenuElement *currentMenu;
 
-const MenuElement *mainMenu[] = {new MenuElement((char *)"Play Songs", SetMenu, SongMenu), new MenuElement((char *)"Play Notes", SetMenu, NotesMenu),
-                                 new MenuElement((char *)"Play Stair", PlaySong, Stairs),  new MenuElement((char *)"Init All Up", Init, Up),
-                                 new MenuElement((char *)"Init All Down", Init, Down),     new MenuElement((char *)"Init All Center", Init, Center),
-                                 new MenuElement((char *)"Show Info", SetMenu, InfoMenu),  new MenuElement((char *)"Buzzer is Off", ToggleBuzzer, 0)};
+const MenuElement *mainMenu[] = {new MenuElement((char *)"Play Songs", SetMenu, new (EventArg[1]){EventArg(SongMenu)}),
+                                 new MenuElement((char *)"Play Notes", SetMenu, new (EventArg[1]){EventArg(NotesMenu)}),
+                                 new MenuElement((char *)"Play Stair", PlaySong, new (EventArg[1]){EventArg(Stairs)}),
+                                 new MenuElement((char *)"Init All Up", Init, new (EventArg[1]){EventArg(Up)}),
+                                 new MenuElement((char *)"Init All Down", Init, new (EventArg[1]){EventArg(Down)}),
+                                 new MenuElement((char *)"Init All Center", Init, new (EventArg[1]){EventArg(Center)}),
+                                 new MenuElement((char *)"Show Info", SetMenu, new (EventArg[1]){EventArg(InfoMenu)}),
+                                 new MenuElement((char *)"Buzzer is Off", ToggleBuzzer, NULL)};
 
-const MenuElement *songMenu[] = {new MenuElement((char *)"Age of Empires", PlaySong, AgeOfEmpiresTheme),
-                                 new MenuElement((char *)"Luxebourg Anth.", PlaySong, LuxembourgAnthem),
-                                 new MenuElement((char *)"Pipi Theme", PlaySong, PipiTheme),
-                                 new MenuElement((char *)"Pommersche", PlaySong, PommerscheTheme),
-                                 new MenuElement((char *)"HTTYD Impro", PlaySong, HttydImpro),
-                                 new MenuElement((char *)">> Stop All <<", EmptyQueue, 0),
-                                 new MenuElement((char *)"Back", SetMenu, MainMenu)};
+const MenuElement *songMenu[] = {new MenuElement((char *)"Age of Empires", PlaySong, new (EventArg[1]){EventArg(AgeOfEmpiresTheme)}),
+                                 new MenuElement((char *)"Luxebourg Anth.", PlaySong, new (EventArg[1]){EventArg(LuxembourgAnthem)}),
+                                 new MenuElement((char *)"Pipi Theme", PlaySong, new (EventArg[1]){EventArg(PipiTheme)}),
+                                 new MenuElement((char *)"Pommersche", PlaySong, new (EventArg[1]){EventArg(PommerscheTheme)}),
+                                 new MenuElement((char *)"HTTYD Impro", PlaySong, new (EventArg[1]){EventArg(HttydImpro)}),
+                                 new MenuElement((char *)">> Stop All <<", EmptyQueue, NULL),
+                                 new MenuElement((char *)"Back", SetMenu, new (EventArg[1]){EventArg(MainMenu)})};
 
-const MenuElement *infoMenu[] = {new MenuElement((char *)"Played: 0", Info, 0), new MenuElement((char *)"Last Note: ?", Info, 0),
-                                 new MenuElement((char *)"Next Note: ?", Info, 0), new MenuElement((char *)"Queue: 0", Info, 0),
-                                 new MenuElement((char *)"Back", SetMenu, MainMenu)};
+const MenuElement *infoMenu[] = {new MenuElement((char *)"Played: 0", Info, NULL), new MenuElement((char *)"Last Note: ?", Info, NULL),
+                                 new MenuElement((char *)"Next Note: ?", Info, NULL), new MenuElement((char *)"Queue: 0", Info, NULL),
+                                 new MenuElement((char *)"Back", SetMenu, new (EventArg[1]){EventArg(MainMenu)})};
 
 const MenuElement *notesMenu[17];
 const char notesLabels[][20] = {"Play Note 1",  "Play Note 2",  "Play Note 3",  "Play Note 4",  "Play Note 5",  "Play Note 6",
@@ -174,7 +178,7 @@ void initializeMenu()
     // Create all the entries for the notes Menu
     for (int i = 0; i < 17; i++)
     {
-        notesMenu[i] = new MenuElement(notesLabels[i], PlayNote, i + 1);
+        notesMenu[i] = new MenuElement(notesLabels[i], PlayNote, new (EventArg[1]){EventArg(i + 1)});
     }
 
     linkMenuItems(notesMenu, 17);

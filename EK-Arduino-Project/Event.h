@@ -3,23 +3,46 @@
 
 #include "Arduino.h"
 #include "Enums.h"
+
+class EventArg
+{
+  public:
+    enum Type
+    {
+        INT,
+        PTR
+    } type;
+
+    union
+    {
+        int intValue;
+        char *ptrValue;
+    };
+
+    EventArg(int intValue) : type(INT), intValue(intValue) {}
+    EventArg(char *ptrValue) : type(PTR), ptrValue(ptrValue) {}
+
+    bool isInt() const { return type == INT; }
+    bool isPtr() const { return type == PTR; }
+};
+
 class Event
 {
   private:
     unsigned long invokeTime;
 
     EventType eventType;
-    int *args;
+    EventArg *eventArgs;
 
     Event *next;
     Event *previous;
 
   public:
-    Event(long invokeTime, EventType eventType, int *args)
+    Event(long invokeTime, EventType eventType, EventArg *eventArgs)
     {
         this->invokeTime = invokeTime;
         this->eventType = eventType;
-        this->args = args;
+        this->eventArgs = eventArgs;
         //  Serial.print("I am due at: '");
         //  Serial.print(invokeTime);
         //  Serial.println("'");
@@ -28,12 +51,7 @@ class Event
         previous = NULL;
     }
 
-    ~Event()
-    {
-        // The args array is created with "new" to be persistent.
-        // Not calling delete would therefore result in a memory leak
-        delete[] args;
-    }
+    ~Event() { delete[] eventArgs; }
 
     void setNext(Event *next) { this->next = next; }
 
@@ -47,7 +65,7 @@ class Event
 
     EventType getEventType() { return this->eventType; }
 
-    int *getArguments() { return this->args; }
+    EventArg *getArguments() { return this->eventArgs; }
 };
 
 #endif
