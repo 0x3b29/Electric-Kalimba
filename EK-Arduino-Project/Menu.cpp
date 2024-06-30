@@ -68,11 +68,11 @@ void setBuzzerMenuItem(bool isBuzzerActive)
 {
     if (isBuzzerActive)
     {
-        mainMenu[6]->setCaption((char *)"Buzzer is On");
+        mainMenu[7]->setCaption((char *)"Buzzer is On");
     }
     else
     {
-        mainMenu[6]->setCaption((char *)"Buzzer is Off");
+        mainMenu[7]->setCaption((char *)"Buzzer is Off");
     }
 }
 
