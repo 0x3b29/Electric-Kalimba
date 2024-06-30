@@ -36,22 +36,15 @@ void updateEncoderButton()
 
         if (newEncoderDiv4Value != oldEncoderDiv4Value)
         {
-            Serial.print("New Value: ");
-            Serial.println(newEncoderDiv4Value);
-
             bool directionUp;
 
             if (newEncoderDiv4Value > oldEncoderDiv4Value)
             {
-                Serial.println("Scroll up");
-
                 directionUp = true;
                 currentMenu = currentMenu->topNeighbour;
             }
             else
             {
-                Serial.println("Scroll down");
-
                 directionUp = false;
                 currentMenu = currentMenu->bottomNeighbour;
             }
@@ -91,18 +84,6 @@ void updateEncoderButton()
 
     if (hasNewClick || (encoderButton.isPressed() && newEncoderDiv4Value != lastEncoderDiv4ButtonPressedValue))
     {
-        if (encoderButton.isPressed() && newEncoderDiv4Value != lastEncoderDiv4ButtonPressedValue)
-        {
-            Serial.print("Retrigger ");
-            Serial.println(currentMenu->eventType);
-        }
-
-        if (hasNewClick)
-        {
-            Serial.print("Trigger ");
-            Serial.println(currentMenu->eventType);
-        }
-
         lastEncoderDiv4ButtonPressedValue = newEncoderDiv4Value;
 
         parseEvent(currentMenu->eventType, currentMenu->args);
