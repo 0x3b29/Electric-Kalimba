@@ -86,6 +86,9 @@ void updateEncoderButton()
     {
         lastEncoderDiv4ButtonPressedValue = newEncoderDiv4Value;
 
-        parseEvent(currentMenu->eventType, currentMenu->args);
+        Serial.println(currentMenu->eventType);
+        Serial.println(currentMenu->eventArgs[0].intValue);
+
+        parseEvent(currentMenu->eventType, currentMenu->eventArgs);
     }
 }
