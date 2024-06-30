@@ -6,7 +6,7 @@
 #define NO_NOTE 255
 
 void playNote(uint8_t note);
-void buzzerNote(uint8_t note);
+void buzzerNote(uint16_t note);
 void processNotesArray();
 void playStairs();
 
