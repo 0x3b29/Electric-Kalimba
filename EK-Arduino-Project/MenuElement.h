@@ -1,18 +1,19 @@
 #include "Enums.h"
+#include "Event.h"
+
 class MenuElement
 {
   public:
-    MenuElement(char *caption, EventType eventType, int arg)
+    MenuElement(char *caption, EventType eventType, EventArg *eventArgs)
     {
         this->caption = caption;
         this->eventType = eventType;
-
-        args = new int[1];
-        args[0] = arg;
+        this->eventArgs = eventArgs;
     }
+
     const char *caption;
     EventType eventType;
-    int *args;
+    EventArg *eventArgs;
 
     MenuElement *topNeighbour;
     MenuElement *bottomNeighbour;
