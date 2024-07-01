@@ -43,9 +43,6 @@ class Event
         this->invokeTime = invokeTime;
         this->eventType = eventType;
         this->eventArgs = eventArgs;
-        //  Serial.print("I am due at: '");
-        //  Serial.print(invokeTime);
-        //  Serial.println("'");
 
         next = NULL;
         previous = NULL;

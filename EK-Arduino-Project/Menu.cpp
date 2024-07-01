@@ -1,7 +1,12 @@
 #include "Menu.h"
+#include "EventManager.h"
+#include "Music.h"
 #include <LiquidCrystal.h>
 
-// Prepare the LCD
+// Forward declarations
+void printToLCD(String firstLine, String secondLine, int selectedLine);
+void clearLCDLine(int line);
+
 LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
 
 String selectedPrefix = "> ";
@@ -38,6 +43,10 @@ const char notesLabels[][20] = {"Play Note 1",  "Play Note 2",  "Play Note 3",  
                                 "Play Note 13", "Play Note 14", "Play Note 15", "Play Note 16", "Play Note 17"};
 
 bool isInfoMenuOpen = false;
+char notesPlayedString[15] = "Played: 0";
+char lastNoteString[15] = "Last Note: ?";
+char nextNoteString[15] = "Next Note: ?";
+char queuedNotesString[15] = "Queued: ?";
 
 void setMenu(uint8_t menu)
 {
@@ -62,7 +71,9 @@ void setMenu(uint8_t menu)
     }
     else
     {
-        Serial.println("Unknown menu option!");
+        Serial.print("Unknown menu option: '");
+        Serial.print(menu);
+        Serial.println("'");
     }
 
     printToLCD(currentMenu->caption, currentMenu->bottomNeighbour->caption, 0);
@@ -140,7 +151,7 @@ void clearLCDLine(int line)
     }
 }
 
-void preparePrintMenuToLCD()
+void updateLcd()
 {
     if (wasLastdirectionUp)
     {
@@ -189,3 +200,63 @@ void initializeMenu()
     // Output menu
     printToLCD(currentMenu->caption, currentMenu->bottomNeighbour->caption, 0);
 }
+
+bool getIsInfoMenuOpen() { return isInfoMenuOpen; }
+
+void setInfoMenuNotesPlayed(uint16_t notesPlayed)
+{
+    snprintf(notesPlayedString, sizeof(notesPlayedString), "Played: %d", notesPlayed);
+    infoMenu[0]->setCaption(notesPlayedString);
+}
+
+void setInfoMenuLastNote(uint8_t lastNotePlayed)
+{
+
+    if (lastNotePlayed == NO_NOTE)
+    {
+        snprintf(lastNoteString, sizeof(lastNoteString), "Last Note: ?");
+    }
+    else
+    {
+        snprintf(lastNoteString, sizeof(lastNoteString), "Last Note: %d", lastNotePlayed);
+    }
+
+    infoMenu[1]->setCaption(lastNoteString);
+}
+
+void setInfoMenuNextNote(uint8_t nextNote)
+{
+    if (nextNote == NO_NOTE)
+    {
+        snprintf(nextNoteString, sizeof(nextNoteString), "Next Note: ?");
+    }
+    else
+    {
+        snprintf(nextNoteString, sizeof(nextNoteString), "Next Note: %d", nextNote);
+    }
+
+    infoMenu[2]->setCaption(nextNoteString);
+}
+
+void setInfoMenuQueuedNotes(uint16_t queuedNotes)
+{
+    snprintf(queuedNotesString, sizeof(queuedNotesString), "Queue: %d", queuedNotes);
+
+    infoMenu[3]->setCaption(queuedNotesString);
+}
+
+void scrollMenuUp()
+{
+    currentMenu = currentMenu->topNeighbour;
+    wasLastdirectionUp = true;
+    updateLcd();
+}
+
+void scrollMenuDown()
+{
+    currentMenu = currentMenu->bottomNeighbour;
+    wasLastdirectionUp = false;
+    updateLcd();
+}
+
+void invokeCurrentMenuEvent() { parseEvent(currentMenu->eventType, currentMenu->eventArgs); }

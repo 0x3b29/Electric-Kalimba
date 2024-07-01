@@ -3,6 +3,7 @@
 #include "Event.h"
 #include "EventManager.h"
 #include "Info.h"
+#include "Menu.h"
 #include "MusicNotes.h"
 #include "Servo.h"
 
@@ -67,87 +68,87 @@ void playNote(uint8_t note)
     switch (note)
     {
     case 1:
-        buzzerNote(NOTE_C5);
+        buzzerNoteIfBuzzerEnabled(NOTE_C5);
         toggleServo(1, 8);
         break;
 
     case 2:
-        buzzerNote(NOTE_D5);
+        buzzerNoteIfBuzzerEnabled(NOTE_D5);
         toggleServo(1, 7);
         break;
 
     case 3:
-        buzzerNote(NOTE_E5);
+        buzzerNoteIfBuzzerEnabled(NOTE_E5);
         toggleServo(2, 0);
         break;
 
     case 4:
-        buzzerNote(NOTE_F5);
+        buzzerNoteIfBuzzerEnabled(NOTE_F5);
         toggleServo(1, 6);
         break;
 
     case 5:
-        buzzerNote(NOTE_G5);
+        buzzerNoteIfBuzzerEnabled(NOTE_G5);
         toggleServo(2, 1);
         break;
 
     case 6:
-        buzzerNote(NOTE_A6);
+        buzzerNoteIfBuzzerEnabled(NOTE_A6);
         toggleServo(1, 5);
         break;
 
     case 7:
-        buzzerNote(NOTE_B6);
+        buzzerNoteIfBuzzerEnabled(NOTE_B6);
         toggleServo(2, 2);
         break;
 
     case 8:
-        buzzerNote(NOTE_C6);
+        buzzerNoteIfBuzzerEnabled(NOTE_C6);
         toggleServo(1, 4);
         break;
 
     case 9:
-        buzzerNote(NOTE_D6);
+        buzzerNoteIfBuzzerEnabled(NOTE_D6);
         toggleServo(2, 3);
         break;
 
     case 10:
-        buzzerNote(NOTE_E6);
+        buzzerNoteIfBuzzerEnabled(NOTE_E6);
         toggleServo(1, 3);
         break;
 
     case 11:
-        buzzerNote(NOTE_F6);
+        buzzerNoteIfBuzzerEnabled(NOTE_F6);
         toggleServo(2, 4);
         break;
 
     case 12:
-        buzzerNote(NOTE_G6);
+        buzzerNoteIfBuzzerEnabled(NOTE_G6);
         toggleServo(1, 2);
         break;
 
     case 13:
-        buzzerNote(NOTE_A7);
+        buzzerNoteIfBuzzerEnabled(NOTE_A7);
         toggleServo(2, 5);
         break;
 
     case 14:
-        buzzerNote(NOTE_B7);
+        buzzerNoteIfBuzzerEnabled(NOTE_B7);
         toggleServo(1, 1);
         break;
 
     case 15:
-        buzzerNote(NOTE_C7);
+        buzzerNoteIfBuzzerEnabled(NOTE_C7);
         toggleServo(2, 6);
         break;
 
     case 16:
-        buzzerNote(NOTE_D7);
+        buzzerNoteIfBuzzerEnabled(NOTE_D7);
         toggleServo(1, 0);
         break;
 
     case 17:
-        buzzerNote(NOTE_E7);
+        buzzerNoteIfBuzzerEnabled(NOTE_E7);
         toggleServo(2, 7);
         break;
     }
@@ -168,7 +169,7 @@ void playNote(uint8_t note)
     millisLastNotePlayed = millisCurrentNote;
 }
 
-void buzzerNote(uint16_t note)
+void buzzerNoteIfBuzzerEnabled(uint16_t note)
 {
     if (isBuzzerEnabled)
     {
@@ -199,3 +200,50 @@ void playStairs()
         addEvent(new Event(millis() + (i * 250), PlayNote, eventArgs));
     }
 }
+
+void playSong(int song)
+{
+    if (song == Stairs)
+    {
+        playStairs();
+    }
+    else if (song == AgeOfEmpiresTheme)
+    {
+        generateEventsFromPROGMEM(ageOfEmpires, millis());
+    }
+    else if (song == LuxembourgAnthem)
+    {
+        currentArrayPosition = 0;
+        currentArraySize = luxembourgAnthemSize;
+        currentNotesArray = luxembourgAnthemNotes;
+        currentOffsetsArray = luxembourgAnthemOffsets;
+
+        processNotesArray();
+    }
+    else if (song == PipiTheme)
+    {
+        generateEventsFromPROGMEM(pipiTheme, millis());
+    }
+    else if (song == PommerscheTheme)
+    {
+        generateEventsFromPROGMEM(pommerscheTheme, millis());
+    }
+    else if (song == HttydImpro)
+    {
+        generateEventsFromPROGMEM(httydImpro, millis());
+    }
+    else
+    {
+        Serial.println("Tried to play undefined song!");
+    }
+}
+
+void toggleBuzzer()
+{
+    isBuzzerEnabled = !isBuzzerEnabled;
+    setBuzzerMenuItem(isBuzzerEnabled);
+    updateLcd();
+}
+
+uint16_t getTotalNotesPlayed() { return totalNotesPlayed; }
+uint8_t getLastNotePlayed() { return lastNotePlayed; }

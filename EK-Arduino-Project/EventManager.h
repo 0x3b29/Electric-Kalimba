@@ -14,7 +14,6 @@ unsigned long createEventFromStr(char input[], unsigned long eventInvokeTime);
 
 uint8_t getNextNote();
 uint16_t getRemainingNotesCount();
-
-extern unsigned long eventCounter;
+unsigned long getProcessedEventsCounter();
 
 #endif

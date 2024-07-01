@@ -3,12 +3,22 @@
 #include "EventManager.h"
 #include <Adafruit_PWMServoDriver.h>
 
-Adafruit_PWMServoDriver leftServoBoard = Adafruit_PWMServoDriver(0x40);  // Create an object of board 1
-Adafruit_PWMServoDriver rightServoBoard = Adafruit_PWMServoDriver(0x41); // Create an object of board 2
+// Forward declarations
+void moveServoDown(int board, int servo);
+void moveServoUp(int board, int servo);
 
-int servoMin = 150;      // This is the servos minimum pulse length count (out of 4096)
-int servoMax = 600;      // This is the servos maximum pulse length count (out of 4096)
-int servoFrequency = 50; // Servo update frequency, analog servos typically run at ~50 Hz
+// Create both servo contoller objects
+Adafruit_PWMServoDriver leftServoBoard = Adafruit_PWMServoDriver(0x40);
+Adafruit_PWMServoDriver rightServoBoard = Adafruit_PWMServoDriver(0x41);
+
+// This is the servos minimum pulse length count (out of 4096)
+int servoMin = 150;
+
+// This is the servos maximum pulse length count (out of 4096)
+int servoMax = 600;
+
+// Servo update frequency, analog servos typically run at ~50 Hz
+int servoFrequency = 50;
 
 int servoTravelTime = 150;
 int servoRelaxAmount = 20;
@@ -23,6 +33,7 @@ int rightServosDownPositions[8] = {125, 120, 125, 127, 129, 131, 133, 135};
 int board2ServoCenterPos[8] = {90, 85, 92, 95, 96, 97, 98, 99};
 int rightServosUpPositions[8] = {63, 58, 69, 70, 71, 67, 71, 71};
 
+// Store the up or down state of each servo
 bool leftServosUp[9];
 bool rightServosUp[8];
 

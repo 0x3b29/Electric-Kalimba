@@ -1,6 +1,5 @@
 #include "EncoderButton.h"
 #include "Adafruit_Debounce.h"
-#include "EventManager.h"
 #include "Menu.h"
 #include <Encoder.h>
 
@@ -36,29 +35,14 @@ void updateEncoderButton()
 
         if (newEncoderDiv4Value != oldEncoderDiv4Value)
         {
-            bool directionUp;
-
             if (newEncoderDiv4Value > oldEncoderDiv4Value)
             {
-                directionUp = true;
-                currentMenu = currentMenu->topNeighbour;
+                scrollMenuUp();
             }
             else
             {
-                directionUp = false;
-                currentMenu = currentMenu->bottomNeighbour;
+                scrollMenuDown();
             }
-
-            if (directionUp)
-            {
-                wasLastdirectionUp = true;
-            }
-            else
-            {
-                wasLastdirectionUp = false;
-            }
-
-            preparePrintMenuToLCD();
 
             oldEncoderDiv4Value = newEncoderDiv4Value;
         }
@@ -86,6 +70,6 @@ void updateEncoderButton()
     {
         lastEncoderDiv4ButtonPressedValue = newEncoderDiv4Value;
 
-        parseEvent(currentMenu->eventType, currentMenu->eventArgs);
+        invokeCurrentMenuEvent();
     }
 }

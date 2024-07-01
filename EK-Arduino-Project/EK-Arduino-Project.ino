@@ -105,9 +105,7 @@ void loop()
         }
         else if (serialInputBuffer[0] == 'b')
         {
-            isBuzzerEnabled = !isBuzzerEnabled;
-            setBuzzerMenuItem(isBuzzerEnabled);
-            preparePrintMenuToLCD();
+            toggleBuzzer();
         }
         else if (serialInputBuffer[0] == 'm')
         {

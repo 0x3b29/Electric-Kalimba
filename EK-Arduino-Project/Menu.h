@@ -4,23 +4,20 @@
 #include "Arduino.h"
 #include "MenuElement.h"
 
-extern bool wasLastdirectionUp;
-// Create the menu items
-extern MenuElement *currentMenu;
-
-extern const MenuElement *mainMenu[];
-extern const MenuElement *songMenu[];
-extern const MenuElement *infoMenu[];
-extern const MenuElement *notesMenu[];
-
-extern bool isInfoMenuOpen;
+void scrollMenuUp();
+void scrollMenuDown();
 
 void setMenu(uint8_t menu);
 void initializeLcd();
 void initializeMenu();
-void printToLCD(String firstLine, String secondLine, int selectedLine);
-void clearLCDLine(int line);
-void preparePrintMenuToLCD();
+void updateLcd();
+void invokeCurrentMenuEvent();
+
 void setBuzzerMenuItem(bool isBuzzerActive);
+bool getIsInfoMenuOpen();
+void setInfoMenuNotesPlayed(uint16_t notesPlayed);
+void setInfoMenuLastNote(uint8_t lastNote);
+void setInfoMenuNextNote(uint8_t nextNote);
+void setInfoMenuQueuedNotes(uint16_t queuedNotes);
 
 #endif

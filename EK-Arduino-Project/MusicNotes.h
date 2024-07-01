@@ -1,3 +1,6 @@
+#ifndef MUSICNOTES_H
+#define MUSICNOTES_H
+
 #define NOTE_CS4 277
 #define NOTE_D4 294
 #define NOTE_DS4 311
@@ -49,3 +52,5 @@
 #define NOTE_CS8 4435
 #define NOTE_D8 4699
 #define NOTE_DS8 4978
+
+#endif

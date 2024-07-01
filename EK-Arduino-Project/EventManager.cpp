@@ -8,7 +8,7 @@
 Event *headNode;
 Event *nodeToDelete;
 
-unsigned long eventCounter = 0;
+unsigned long processedEventsCounter = 0;
 
 void updateEventManager()
 {
@@ -23,9 +23,11 @@ void updateEventManager()
         headNode = headNode->getNext();
         delete nodeToDelete;
         nodeToDelete = NULL;
-        eventCounter++;
+        processedEventsCounter++;
     }
 }
+
+unsigned long getProcessedEventsCounter() { return processedEventsCounter; }
 
 uint8_t getNextNote()
 {
@@ -139,12 +141,12 @@ void generateEventsFromPROGMEM(const char *startChar, unsigned long eventInvokeT
     char buffer[10];
     int bufferIndex = 0;
 
-    int eventCounter = 0;
+    int processedEventsCounter = 0;
     const int maxEventCounter = 100;
 
     unsigned long nextEventInvokeTime = eventInvokeTime;
 
-    while (eventCounter < maxEventCounter)
+    while (processedEventsCounter < maxEventCounter)
     {
         c = pgm_read_byte(currentChar);
 
@@ -157,7 +159,7 @@ void generateEventsFromPROGMEM(const char *startChar, unsigned long eventInvokeT
         {
             buffer[bufferIndex] = '\0';
             nextEventInvokeTime = createEventFromStr(buffer, nextEventInvokeTime);
-            eventCounter++;
+            processedEventsCounter++;
             bufferIndex = 0;
         }
         else
@@ -169,7 +171,7 @@ void generateEventsFromPROGMEM(const char *startChar, unsigned long eventInvokeT
         currentChar++;
     }
 
-    if (eventCounter >= maxEventCounter)
+    if (processedEventsCounter >= maxEventCounter)
     {
         EventArg *eventArgs = new EventArg[1]{EventArg(currentChar)};
         addEvent(new Event(nextEventInvokeTime, BufferMoreNotes, eventArgs));
@@ -208,45 +210,11 @@ void parseEvent(EventType eventType, EventArg *eventArgs)
         break;
 
     case ToggleBuzzer:
-        isBuzzerEnabled = !isBuzzerEnabled;
-        setBuzzerMenuItem(isBuzzerEnabled);
-        preparePrintMenuToLCD();
+        toggleBuzzer();
         break;
 
     case PlaySong:
-        if (eventArgs[0].intValue == Stairs)
-        {
-            playStairs();
-        }
-        else if (eventArgs[0].intValue == AgeOfEmpiresTheme)
-        {
-            generateEventsFromPROGMEM(ageOfEmpires, millis());
-        }
-        else if (eventArgs[0].intValue == LuxembourgAnthem)
-        {
-            currentArrayPosition = 0;
-            currentArraySize = luxembourgAnthemSize;
-            currentNotesArray = luxembourgAnthemNotes;
-            currentOffsetsArray = luxembourgAnthemOffsets;
-
-            processNotesArray();
-        }
-        else if (eventArgs[0].intValue == PipiTheme)
-        {
-            generateEventsFromPROGMEM(pipiTheme, millis());
-        }
-        else if (eventArgs[0].intValue == PommerscheTheme)
-        {
-            generateEventsFromPROGMEM(pommerscheTheme, millis());
-        }
-        else if (eventArgs[0].intValue == HttydImpro)
-        {
-            generateEventsFromPROGMEM(httydImpro, millis());
-        }
-        else
-        {
-            Serial.println("Tried to play undefined song!");
-        }
+        playSong(eventArgs[0].intValue);
         break;
 
     case BufferMoreNotes:
