@@ -14,16 +14,14 @@ char serialInputBuffer[100];
 void setup()
 {
     Serial.begin(115200);
-    Serial.setTimeout(5000);
 
     initializeEncoderButton();
     initializeServos();
     initializeLcd();
     initializeMenu();
-
-    // Move all servos to defined positions
-    Serial.println("Initialize Up");
     moveAllServosUp();
+
+    Serial.println("Initialisation Complete...");
 }
 
 void loop()
