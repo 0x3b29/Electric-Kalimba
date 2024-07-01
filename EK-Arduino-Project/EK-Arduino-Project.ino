@@ -79,7 +79,7 @@ void loop()
 
     if (commaPos != NULL)
     {
-        createEventFromStr(serialInputBuffer);
+        createEventFromStr(serialInputBuffer, millis());
     }
     else
     {

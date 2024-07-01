@@ -8,8 +8,6 @@
 Event *headNode;
 Event *nodeToDelete;
 
-unsigned long lastEventDue = 0;
-unsigned long lastOffset;
 unsigned long eventCounter = 0;
 
 void updateEventManager()
@@ -80,7 +78,6 @@ void emptyEventQueue()
     }
 
     headNode = NULL;
-    lastEventDue = 0;
 }
 
 void addEvent(Event *newEvent)
@@ -134,7 +131,7 @@ void addEvent(Event *newEvent)
     }
 }
 
-void generateEventsFromPROGMEM(const char *startChar)
+void generateEventsFromPROGMEM(const char *startChar, unsigned long eventInvokeTime)
 {
     char c;
     char *currentChar = startChar;
@@ -144,6 +141,8 @@ void generateEventsFromPROGMEM(const char *startChar)
 
     int eventCounter = 0;
     const int maxEventCounter = 100;
+
+    unsigned long nextEventInvokeTime = eventInvokeTime;
 
     while (eventCounter < maxEventCounter)
     {
@@ -157,7 +156,7 @@ void generateEventsFromPROGMEM(const char *startChar)
         if (c == ';')
         {
             buffer[bufferIndex] = '\0';
-            createEventFromStr(buffer);
+            nextEventInvokeTime = createEventFromStr(buffer, nextEventInvokeTime);
             eventCounter++;
             bufferIndex = 0;
         }
@@ -172,9 +171,8 @@ void generateEventsFromPROGMEM(const char *startChar)
 
     if (eventCounter >= maxEventCounter)
     {
-        Serial.println("Found more events than maxEventCounter, added Buffer operation.");
         EventArg *eventArgs = new EventArg[1]{EventArg(currentChar)};
-        addEvent(new Event(lastEventDue + lastOffset, BufferMoreNotes, eventArgs));
+        addEvent(new Event(nextEventInvokeTime, BufferMoreNotes, eventArgs));
     }
 }
 
@@ -222,7 +220,7 @@ void parseEvent(EventType eventType, EventArg *eventArgs)
         }
         else if (eventArgs[0].intValue == AgeOfEmpiresTheme)
         {
-            generateEventsFromPROGMEM(ageOfEmpires);
+            generateEventsFromPROGMEM(ageOfEmpires, millis());
         }
         else if (eventArgs[0].intValue == LuxembourgAnthem)
         {
@@ -235,23 +233,15 @@ void parseEvent(EventType eventType, EventArg *eventArgs)
         }
         else if (eventArgs[0].intValue == PipiTheme)
         {
-            generateEventsFromPROGMEM(pipiTheme);
+            generateEventsFromPROGMEM(pipiTheme, millis());
         }
         else if (eventArgs[0].intValue == PommerscheTheme)
         {
-            generateEventsFromPROGMEM(pommerscheTheme);
+            generateEventsFromPROGMEM(pommerscheTheme, millis());
         }
         else if (eventArgs[0].intValue == HttydImpro)
         {
-            generateEventsFromPROGMEM(httydImpro);
-        }
-        else if (eventArgs[0].intValue == HttydYt)
-        {
-            generateEventsFromPROGMEM(httydYt);
-        }
-        else if (eventArgs[0].intValue == InterstellardYt)
-        {
-            generateEventsFromPROGMEM(interstellarYt);
+            generateEventsFromPROGMEM(httydImpro, millis());
         }
         else
         {
@@ -260,7 +250,7 @@ void parseEvent(EventType eventType, EventArg *eventArgs)
         break;
 
     case BufferMoreNotes:
-        generateEventsFromPROGMEM(eventArgs[0].ptrValue);
+        generateEventsFromPROGMEM(eventArgs[0].ptrValue, millis());
         break;
 
     case ProcessCurrentArray:
@@ -276,7 +266,7 @@ void parseEvent(EventType eventType, EventArg *eventArgs)
     }
 }
 
-void createEventFromStr(char input[])
+unsigned long createEventFromStr(char input[], unsigned long eventInvokeTime)
 {
     // Search for position of ','
     char *commaPos = strchr(input, ',');
@@ -284,26 +274,17 @@ void createEventFromStr(char input[])
     // Replace ',' with string termination
     *commaPos = 0;
 
+    // Extract the note to be played
     EventArg *eventArgs = new EventArg[1]{EventArg(atoi(input))};
+
+    addEvent(new Event(eventInvokeTime, PlayNote, eventArgs));
 
     // Shift the pointer from the Null terminator to start of the notes offset
     ++commaPos;
 
-    // Parse the notes offset
-    int offset = atoi(commaPos);
+    // Parse the notes delay before the next note gets played
+    int offsetBeforeNextEvent = atoi(commaPos);
 
-    if (lastEventDue >= millis())
-    {
-        // Last event has not yet happened
-        addEvent(new Event((lastEventDue + lastOffset), PlayNote, eventArgs));
-        lastEventDue = lastEventDue + lastOffset;
-        lastOffset = offset;
-    }
-    else
-    {
-        // Last event is over
-        addEvent(new Event((millis()), PlayNote, eventArgs));
-        lastEventDue = millis();
-        lastOffset = offset;
-    }
+    // Return the time the following note event should be invoked
+    return eventInvokeTime + offsetBeforeNextEvent;
 }
