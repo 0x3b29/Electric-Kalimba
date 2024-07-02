@@ -60,6 +60,50 @@ const PROGMEM char httydImpro[] =
     "9,413;9,184;10,295;6,367;6,285;7,115;8,501;8,159;9,220;8,283;7,438;6,70;5,184;6,768;8,316;8,194;5,232;8,229;9,223;7,218;5,285;7,192;8,266;6,252;5,252;5,"
     "221;4,278;4,183;3,257;2,221;1,163;8,270;5,214;8,262;9,258;7,214;5,264;7,290;8,294;6,311;5,307;5,289;4,332;4,360;3,405;2,637;1,1000;";
 
+// To convert notes names to numbers, we have this lookup construct where we can string compare against
+const char *notesStringLookup[] = {"C4", "D4", "E4", "F4", "G4", "A4", "B4", "C5", "D5", "E5", "F5", "G5", "A5", "B5", "C6", "D6", "E6"};
+const int notesValueLookup[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17};
+const int sizeOfLookup = sizeof(notesValueLookup) / sizeof(notesValueLookup[0]);
+
+uint8_t getNoteValue(char *noteString)
+{
+    if (noteString[0] >= 48 && noteString[0] <= 57)
+    {
+        // In case the note started with a number, we parse it as int
+        uint8_t note = atoi(noteString);
+
+        if (note == -1)
+        {
+            // Parsing failed
+            return NO_NOTE;
+        }
+        else if (note > 17 && note < 1)
+        {
+            // Parsing worked, but not expected range
+            return NO_NOTE;
+        }
+        else
+        {
+            // Note is valid
+            return note;
+        }
+    }
+
+    // If we get here, we know that noteString started with anything else than a number.
+
+    // Iterate over the array and find the matching note
+    for (int i = 0; i < sizeOfLookup; i++)
+    {
+        if (strcmp(noteString, notesStringLookup[i]) == 0)
+        {
+            return notesValueLookup[i];
+        }
+    }
+
+    // If the note is not found, return NO_NOTE as an error code
+    return NO_NOTE;
+}
+
 void playNote(uint8_t note)
 {
     totalNotesPlayed++;

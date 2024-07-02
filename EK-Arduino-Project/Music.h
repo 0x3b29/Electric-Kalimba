@@ -12,6 +12,7 @@ void playStairs();
 void playSong(int song);
 void toggleBuzzer();
 
+uint8_t getNoteValue(char *noteString);
 uint16_t getTotalNotesPlayed();
 uint8_t getLastNotePlayed();
 

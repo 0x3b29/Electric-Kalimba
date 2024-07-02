@@ -242,9 +242,7 @@ unsigned long createEventFromStr(char input[], unsigned long eventInvokeTime)
     // Replace ',' with string termination
     *commaPos = 0;
 
-    // Extract the note to be played
-    EventArg *eventArgs = new EventArg[1]{EventArg(atoi(input))};
-
+    EventArg *eventArgs = new EventArg[1]{EventArg(getNoteValue(input))};
     addEvent(new Event(eventInvokeTime, PlayNote, eventArgs));
 
     // Shift the pointer from the Null terminator to start of the notes offset

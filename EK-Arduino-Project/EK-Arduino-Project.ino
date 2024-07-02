@@ -10,6 +10,7 @@
 
 int bufferPosition;
 char serialInputBuffer[100];
+unsigned long nextEventInvokeTime = 0;
 
 void setup()
 {
@@ -77,9 +78,14 @@ void loop()
 
     char *commaPos = strchr(serialInputBuffer, ',');
 
+    if (nextEventInvokeTime < millis())
+    {
+        nextEventInvokeTime = millis();
+    }
+
     if (commaPos != NULL)
     {
-        createEventFromStr(serialInputBuffer, millis());
+        nextEventInvokeTime = createEventFromStr(serialInputBuffer, nextEventInvokeTime);
     }
     else
     {
@@ -113,11 +119,11 @@ void loop()
         }
         else
         {
-            int val = atoi(serialInputBuffer);
+            uint8_t note = getNoteValue(serialInputBuffer);
 
-            if (val > 0)
+            if (note != NO_NOTE)
             {
-                playNote(val);
+                playNote(note);
             }
         }
     }
