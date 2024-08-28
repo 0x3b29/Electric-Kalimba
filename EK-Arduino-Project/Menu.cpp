@@ -33,9 +33,10 @@ const MenuElement *songMenu[] = {new MenuElement((char *)"Age of Empires", PlayS
                                  new MenuElement((char *)">> Stop All <<", EmptyQueue, NULL),
                                  new MenuElement((char *)"Back", SetMenu, new (EventArg[1]){EventArg(MainMenu)})};
 
-const MenuElement *infoMenu[] = {new MenuElement((char *)"Played: 0", Info, NULL), new MenuElement((char *)"Last Note: ?", Info, NULL),
-                                 new MenuElement((char *)"Next Note: ?", Info, NULL), new MenuElement((char *)"Queue: 0", Info, NULL),
-                                 new MenuElement((char *)"Back", SetMenu, new (EventArg[1]){EventArg(MainMenu)})};
+const MenuElement *infoMenu[] = {
+    new MenuElement((char *)"Played 0", Info, NULL),    new MenuElement((char *)"Remaining 0", Info, NULL),
+    new MenuElement((char *)"Last Note ?", Info, NULL), new MenuElement((char *)"Next Note ?", Info, NULL),
+    new MenuElement((char *)"Queue 0", Info, NULL),     new MenuElement((char *)"Back", SetMenu, new (EventArg[1]){EventArg(MainMenu)})};
 
 const MenuElement *notesMenu[17];
 const char notesLabels[][20] = {"Play Note 1",  "Play Note 2",  "Play Note 3",  "Play Note 4",  "Play Note 5",  "Play Note 6",
@@ -43,10 +44,11 @@ const char notesLabels[][20] = {"Play Note 1",  "Play Note 2",  "Play Note 3",  
                                 "Play Note 13", "Play Note 14", "Play Note 15", "Play Note 16", "Play Note 17"};
 
 bool isInfoMenuOpen = false;
-char notesPlayedString[15] = "Played: 0";
-char lastNoteString[15] = "Last Note: ?";
-char nextNoteString[15] = "Next Note: ?";
-char queuedNotesString[15] = "Queued: ?";
+char notesPlayedString[15] = "Played 0";
+char remainingNotesString[15] = "Remaining 0";
+char lastNoteString[15] = "Last Note ?";
+char nextNoteString[15] = "Next Note ?";
+char queuedNotesString[15] = "Queued ?";
 
 void setMenu(uint8_t menu)
 {
@@ -205,7 +207,7 @@ bool getIsInfoMenuOpen() { return isInfoMenuOpen; }
 
 void setInfoMenuNotesPlayed(uint16_t notesPlayed)
 {
-    snprintf(notesPlayedString, sizeof(notesPlayedString), "Played: %d", notesPlayed);
+    snprintf(notesPlayedString, sizeof(notesPlayedString), "Played %d", notesPlayed);
     infoMenu[0]->setCaption(notesPlayedString);
 }
 
@@ -214,35 +216,41 @@ void setInfoMenuLastNote(uint8_t lastNotePlayed)
 
     if (lastNotePlayed == NO_NOTE)
     {
-        snprintf(lastNoteString, sizeof(lastNoteString), "Last Note: ?");
+        snprintf(lastNoteString, sizeof(lastNoteString), "Last Note ?");
     }
     else
     {
-        snprintf(lastNoteString, sizeof(lastNoteString), "Last Note: %d", lastNotePlayed);
+        snprintf(lastNoteString, sizeof(lastNoteString), "Last Note %d", lastNotePlayed);
     }
 
-    infoMenu[1]->setCaption(lastNoteString);
+    infoMenu[2]->setCaption(lastNoteString);
 }
 
 void setInfoMenuNextNote(uint8_t nextNote)
 {
     if (nextNote == NO_NOTE)
     {
-        snprintf(nextNoteString, sizeof(nextNoteString), "Next Note: ?");
+        snprintf(nextNoteString, sizeof(nextNoteString), "Next Note ?");
     }
     else
     {
-        snprintf(nextNoteString, sizeof(nextNoteString), "Next Note: %d", nextNote);
+        snprintf(nextNoteString, sizeof(nextNoteString), "Next Note %d", nextNote);
     }
 
-    infoMenu[2]->setCaption(nextNoteString);
+    infoMenu[3]->setCaption(nextNoteString);
 }
 
 void setInfoMenuQueuedNotes(uint16_t queuedNotes)
 {
-    snprintf(queuedNotesString, sizeof(queuedNotesString), "Queue: %d", queuedNotes);
+    snprintf(queuedNotesString, sizeof(queuedNotesString), "Queue %d", queuedNotes);
 
-    infoMenu[3]->setCaption(queuedNotesString);
+    infoMenu[4]->setCaption(queuedNotesString);
+}
+
+void setInfoMenuRemainingNotes(uint16_t remainingNotes)
+{
+    snprintf(remainingNotesString, sizeof(remainingNotesString), "Remaining %d", remainingNotes);
+    infoMenu[1]->setCaption(remainingNotesString);
 }
 
 void scrollMenuUp()

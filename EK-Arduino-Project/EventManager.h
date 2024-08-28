@@ -13,7 +13,7 @@ void generateEventsFromPROGMEM(const char *startChar, unsigned long eventInvokeT
 unsigned long createEventFromStr(char input[], unsigned long eventInvokeTime);
 
 uint8_t getNextNote();
-uint16_t getRemainingNotesCount();
+uint16_t getRemainingNotesInQueue();
 unsigned long getProcessedEventsCounter();
 
 #endif

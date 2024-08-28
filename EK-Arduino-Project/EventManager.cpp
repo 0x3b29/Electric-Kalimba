@@ -48,7 +48,7 @@ uint8_t getNextNote()
     return NO_NOTE;
 }
 
-uint16_t getRemainingNotesCount()
+uint16_t getRemainingNotesInQueue()
 {
     uint16_t noteEventsCounter = 0;
     Event *event = headNode;
@@ -187,6 +187,7 @@ void parseEvent(EventType eventType, EventArg *eventArgs)
         break;
 
     case PlayNote:
+        decreaseRemainingNotesCounter();
         playNote(eventArgs[0].intValue);
         break;
 

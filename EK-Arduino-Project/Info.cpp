@@ -28,7 +28,8 @@ void updateInfo()
         lastObservedEventCounter = processedEventsCounter;
 
         setInfoMenuNextNote(getNextNote());
-        setInfoMenuQueuedNotes(getRemainingNotesCount());
+        setInfoMenuQueuedNotes(getRemainingNotesInQueue());
+        setInfoMenuRemainingNotes(getRemainingNotes());
 
         shouldUpdateLcd = true;
     }

@@ -16,8 +16,11 @@ void invokeCurrentMenuEvent();
 void setBuzzerMenuItem(bool isBuzzerActive);
 bool getIsInfoMenuOpen();
 void setInfoMenuNotesPlayed(uint16_t notesPlayed);
+void setInfoMenuRemainingNotes(uint16_t notesPlayed);
 void setInfoMenuLastNote(uint8_t lastNote);
 void setInfoMenuNextNote(uint8_t nextNote);
 void setInfoMenuQueuedNotes(uint16_t queuedNotes);
+
+void decreaseRemainingNotesCounter();
 
 #endif

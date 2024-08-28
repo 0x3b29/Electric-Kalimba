@@ -18,6 +18,7 @@ short currentArrayPosition;
 short currentArraySize;
 
 uint16_t totalNotesPlayed = 0;
+uint16_t remainingNotes = 0;
 uint8_t lastNotePlayed = NO_NOTE;
 unsigned long millisLastNotePlayed = 0;
 
@@ -245,6 +246,31 @@ void playStairs()
     }
 }
 
+void decreaseRemainingNotesCounter() { remainingNotes--; }
+
+void increaseRemainingNotesCounter(const char *startChar)
+{
+    char c;
+    char *currentChar = startChar;
+
+    while (true)
+    {
+        c = pgm_read_byte(currentChar);
+
+        if (c == NULL)
+        {
+            break;
+        }
+
+        if (c == ';')
+        {
+            remainingNotes++;
+        }
+
+        currentChar++;
+    }
+}
+
 void playSong(int song)
 {
     if (song == Stairs)
@@ -253,6 +279,7 @@ void playSong(int song)
     }
     else if (song == AgeOfEmpiresTheme)
     {
+        increaseRemainingNotesCounter(ageOfEmpires);
         generateEventsFromPROGMEM(ageOfEmpires, millis());
     }
     else if (song == LuxembourgAnthem)
@@ -266,15 +293,33 @@ void playSong(int song)
     }
     else if (song == PipiTheme)
     {
+        increaseRemainingNotesCounter(pipiTheme);
         generateEventsFromPROGMEM(pipiTheme, millis());
     }
     else if (song == PommerscheTheme)
     {
+        increaseRemainingNotesCounter(pommerscheTheme);
         generateEventsFromPROGMEM(pommerscheTheme, millis());
     }
     else if (song == HttydImpro)
     {
+        increaseRemainingNotesCounter(httydImpro);
         generateEventsFromPROGMEM(httydImpro, millis());
+    }
+    else if (song == FriendsTheme)
+    {
+        increaseRemainingNotesCounter(friendsTheme);
+        generateEventsFromPROGMEM(friendsTheme, millis());
+    }
+    else if (song == HttydYt)
+    {
+        increaseRemainingNotesCounter(httydYt);
+        generateEventsFromPROGMEM(httydYt, millis());
+    }
+    else if (song == InterstellarYt)
+    {
+        increaseRemainingNotesCounter(interstellarYt);
+        generateEventsFromPROGMEM(interstellarYt, millis());
     }
     else
     {
@@ -290,4 +335,5 @@ void toggleBuzzer()
 }
 
 uint16_t getTotalNotesPlayed() { return totalNotesPlayed; }
+uint16_t getRemainingNotes() { return remainingNotes; }
 uint8_t getLastNotePlayed() { return lastNotePlayed; }

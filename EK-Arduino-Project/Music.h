@@ -14,6 +14,7 @@ void toggleBuzzer();
 
 uint8_t getNoteValue(char *noteString);
 uint16_t getTotalNotesPlayed();
+uint16_t getRemainingNotes();
 uint8_t getLastNotePlayed();
 
 #endif
