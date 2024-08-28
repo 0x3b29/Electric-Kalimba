@@ -117,6 +117,15 @@ void loop()
         {
             freeMemory();
         }
+        else if (serialInputBuffer[0] == 's')
+        {
+            uint8_t note = getNoteValue(&serialInputBuffer[1]);
+
+            if (note != NO_NOTE)
+            {
+                muteNote(note);
+            }
+        }
         else
         {
             uint8_t note = getNoteValue(serialInputBuffer);

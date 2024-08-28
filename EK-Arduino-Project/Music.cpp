@@ -214,6 +214,81 @@ void playNote(uint8_t note)
     millisLastNotePlayed = millisCurrentNote;
 }
 
+void muteNote(uint8_t note)
+{
+    switch (note)
+    {
+    case 1:
+        moveServoCenter(1, 8);
+        break;
+
+    case 2:
+        moveServoCenter(1, 7);
+        break;
+
+    case 3:
+        moveServoCenter(2, 0);
+        break;
+
+    case 4:
+        moveServoCenter(1, 6);
+        break;
+
+    case 5:
+        moveServoCenter(2, 1);
+        break;
+
+    case 6:
+        moveServoCenter(1, 5);
+        break;
+
+    case 7:
+        moveServoCenter(2, 2);
+        break;
+
+    case 8:
+        moveServoCenter(1, 4);
+        break;
+
+    case 9:
+        moveServoCenter(2, 3);
+        break;
+
+    case 10:
+        moveServoCenter(1, 3);
+        break;
+
+    case 11:
+        moveServoCenter(2, 4);
+        break;
+
+    case 12:
+        moveServoCenter(1, 2);
+        break;
+
+    case 13:
+        moveServoCenter(2, 5);
+        break;
+
+    case 14:
+        moveServoCenter(1, 1);
+        break;
+
+    case 15:
+        moveServoCenter(2, 6);
+        break;
+
+    case 16:
+        moveServoCenter(1, 0);
+        break;
+
+    case 17:
+        buzzerNoteIfBuzzerEnabled(NOTE_E7);
+        toggleServo(2, 7);
+        break;
+    }
+}
+
 void buzzerNoteIfBuzzerEnabled(uint16_t note)
 {
     if (isBuzzerEnabled)

@@ -24,14 +24,16 @@ int servoTravelTime = 150;
 int servoRelaxAmount = 20;
 
 // Left side servos work as expected, lower numbers = lower down
+// Left numbers are outer servos, towards the right -> towards the center
 int leftServosUpPositions[9] = {105, 100, 100, 100, 105, 105, 105, 105, 105};
-int board1ServoCenterPos[9] = {75, 75, 75, 80, 80, 80, 80, 80, 80};
+int leftServosCenterPositions[9] = {70, 70, 70, 70, 72, 72, 75, 73, 72};
 int leftServosDownPositions[9] = {40, 40, 40, 42, 43, 44, 45, 45, 45};
 
 // Right side servos work in opposite directions, bigger numbers = lower down
+// Left numbers are inner servos, towards the right -> towards outside
+int rightServosUpPositions[8] = {63, 58, 69, 70, 71, 70, 74, 75};
+int rightServosCenterPositions[8] = {92, 83, 93, 100, 100, 98, 100, 102};
 int rightServosDownPositions[8] = {125, 120, 125, 127, 129, 131, 133, 135};
-int board2ServoCenterPos[8] = {90, 85, 92, 95, 96, 97, 98, 99};
-int rightServosUpPositions[8] = {63, 58, 69, 70, 71, 67, 71, 71};
 
 // Store the up or down state of each servo
 bool leftServosUp[9];
@@ -141,16 +143,28 @@ void toggleServo(int board, int servo)
     }
 }
 
+void moveServoCenter(int board, int servo)
+{
+    if (board == 1)
+    {
+        leftServoBoard.setPWM(servo, 0, map(leftServosCenterPositions[servo], 0, 180, servoMin, servoMax));
+    }
+    else
+    {
+        rightServoBoard.setPWM(servo, 0, map(rightServosCenterPositions[servo], 0, 180, servoMin, servoMax));
+    }
+}
+
 void moveAllServosCenter()
 {
     for (int i = 0; i <= 8; i++)
     {
-        leftServoBoard.setPWM(i, 0, map(board1ServoCenterPos[i], 0, 180, servoMin, servoMax));
+        leftServoBoard.setPWM(i, 0, map(leftServosCenterPositions[i], 0, 180, servoMin, servoMax));
     }
 
     for (int i = 0; i <= 7; i++)
     {
-        rightServoBoard.setPWM(i, 0, map(board2ServoCenterPos[i], 0, 180, servoMin, servoMax));
+        rightServoBoard.setPWM(i, 0, map(rightServosCenterPositions[i], 0, 180, servoMin, servoMax));
     }
 }
 
