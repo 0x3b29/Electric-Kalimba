@@ -1,4 +1,5 @@
 
+#include "EK-Arduino-Project.h"
 #include "EncoderButton.h"
 #include "Enums.h"
 #include "EventManager.h"
@@ -16,10 +17,15 @@ void setup()
 {
     Serial.begin(115200);
 
+    // Prototype 2 has no display, no encoder button and therefore needs no menu.
+    // It is designed as a robot that always has a serial connection.
+#if PROTOTYPE1
     initializeEncoderButton();
-    initializeServos();
     initializeLcd();
     initializeMenu();
+#endif
+
+    initializeServos();
     moveAllServosUp();
 
     Serial.println("Initialisation Complete...");
@@ -108,6 +114,14 @@ void loop()
         {
             Serial.println("Xing ...");
             playStairs();
+        }
+        else if (serialInputBuffer[0] == 'a')
+        {
+            adjustServoPosition(serialInputBuffer[1], serialInputBuffer[2], serialInputBuffer[3], serialInputBuffer[4]);
+        }
+        else if (serialInputBuffer[0] == 'p')
+        {
+            printServoPositions();
         }
         else if (serialInputBuffer[0] == 'b')
         {

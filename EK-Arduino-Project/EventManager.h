@@ -16,4 +16,7 @@ uint8_t getNextNote();
 uint16_t getRemainingNotesInQueue();
 unsigned long getProcessedEventsCounter();
 
+bool hasSetServoPosition(int board, int servo);
+void replaceSetServoPosition(int board, int servo, int newPosition);
+
 #endif

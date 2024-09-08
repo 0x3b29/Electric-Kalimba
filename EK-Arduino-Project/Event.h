@@ -16,11 +16,11 @@ class EventArg
     union
     {
         int intValue;
-        char *ptrValue;
+        const char *ptrValue;
     };
 
     EventArg(int intValue) : type(INT), intValue(intValue) {}
-    EventArg(char *ptrValue) : type(PTR), ptrValue(ptrValue) {}
+    EventArg(const char *ptrValue) : type(PTR), ptrValue(ptrValue) {}
 
     bool isInt() const { return type == INT; }
     bool isPtr() const { return type == PTR; }

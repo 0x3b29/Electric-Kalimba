@@ -133,10 +133,52 @@ void addEvent(Event *newEvent)
     }
 }
 
+bool hasSetServoPosition(int board, int servo)
+{
+    Event *event = headNode;
+
+    while (event != NULL)
+    {
+        if (event->getEventType() == SetServoPosition)
+        {
+            EventArg *eventArgs = event->getArguments();
+
+            if (eventArgs[0].intValue == board && eventArgs[1].intValue == servo)
+            {
+                return true;
+            }
+        }
+
+        event = event->getNext();
+    }
+
+    return false;
+}
+
+void replaceSetServoPosition(int board, int servo, int newPosition)
+{
+    Event *event = headNode;
+
+    while (event != NULL)
+    {
+        if (event->getEventType() == SetServoPosition)
+        {
+            EventArg *eventArgs = event->getArguments();
+
+            if (eventArgs[0].intValue == board && eventArgs[1].intValue == servo)
+            {
+                eventArgs[2].intValue = newPosition;
+            }
+        }
+
+        event = event->getNext();
+    }
+}
+
 void generateEventsFromPROGMEM(const char *startChar, unsigned long eventInvokeTime)
 {
     char c;
-    char *currentChar = startChar;
+    const char *currentChar = startChar;
 
     char buffer[10];
     int bufferIndex = 0;
