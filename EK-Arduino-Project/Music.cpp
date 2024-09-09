@@ -105,6 +105,17 @@ uint8_t getNoteValue(char *noteString)
     return NO_NOTE;
 }
 
+void playNoteIfNotAlreadyPlaying(int board, int servo)
+{
+    // This prevents two notes in quick succession to eliminate each other and none beeign played.
+    // With this solution, at least the first one is played.
+    // Todo: check if delayed play of note in else case makes sense
+    if (!hasSetServoPosition(board, servo))
+    {
+        toggleServo(board, servo);
+    }
+}
+
 void playNote(uint8_t note)
 {
     totalNotesPlayed++;
@@ -114,87 +125,87 @@ void playNote(uint8_t note)
     {
     case 1:
         buzzerNoteIfBuzzerEnabled(NOTE_C5);
-        toggleServo(1, 8);
+        playNoteIfNotAlreadyPlaying(1, 8);
         break;
 
     case 2:
         buzzerNoteIfBuzzerEnabled(NOTE_D5);
-        toggleServo(1, 7);
+        playNoteIfNotAlreadyPlaying(1, 7);
         break;
 
     case 3:
         buzzerNoteIfBuzzerEnabled(NOTE_E5);
-        toggleServo(2, 0);
+        playNoteIfNotAlreadyPlaying(2, 0);
         break;
 
     case 4:
         buzzerNoteIfBuzzerEnabled(NOTE_F5);
-        toggleServo(1, 6);
+        playNoteIfNotAlreadyPlaying(1, 6);
         break;
 
     case 5:
         buzzerNoteIfBuzzerEnabled(NOTE_G5);
-        toggleServo(2, 1);
+        playNoteIfNotAlreadyPlaying(2, 1);
         break;
 
     case 6:
         buzzerNoteIfBuzzerEnabled(NOTE_A6);
-        toggleServo(1, 5);
+        playNoteIfNotAlreadyPlaying(1, 5);
         break;
 
     case 7:
         buzzerNoteIfBuzzerEnabled(NOTE_B6);
-        toggleServo(2, 2);
+        playNoteIfNotAlreadyPlaying(2, 2);
         break;
 
     case 8:
         buzzerNoteIfBuzzerEnabled(NOTE_C6);
-        toggleServo(1, 4);
+        playNoteIfNotAlreadyPlaying(1, 4);
         break;
 
     case 9:
         buzzerNoteIfBuzzerEnabled(NOTE_D6);
-        toggleServo(2, 3);
+        playNoteIfNotAlreadyPlaying(2, 3);
         break;
 
     case 10:
         buzzerNoteIfBuzzerEnabled(NOTE_E6);
-        toggleServo(1, 3);
+        playNoteIfNotAlreadyPlaying(1, 3);
         break;
 
     case 11:
         buzzerNoteIfBuzzerEnabled(NOTE_F6);
-        toggleServo(2, 4);
+        playNoteIfNotAlreadyPlaying(2, 4);
         break;
 
     case 12:
         buzzerNoteIfBuzzerEnabled(NOTE_G6);
-        toggleServo(1, 2);
+        playNoteIfNotAlreadyPlaying(1, 2);
         break;
 
     case 13:
         buzzerNoteIfBuzzerEnabled(NOTE_A7);
-        toggleServo(2, 5);
+        playNoteIfNotAlreadyPlaying(2, 5);
         break;
 
     case 14:
         buzzerNoteIfBuzzerEnabled(NOTE_B7);
-        toggleServo(1, 1);
+        playNoteIfNotAlreadyPlaying(1, 1);
         break;
 
     case 15:
         buzzerNoteIfBuzzerEnabled(NOTE_C7);
-        toggleServo(2, 6);
+        playNoteIfNotAlreadyPlaying(2, 6);
         break;
 
     case 16:
         buzzerNoteIfBuzzerEnabled(NOTE_D7);
-        toggleServo(1, 0);
+        playNoteIfNotAlreadyPlaying(1, 0);
         break;
 
     case 17:
         buzzerNoteIfBuzzerEnabled(NOTE_E7);
-        toggleServo(2, 7);
+        playNoteIfNotAlreadyPlaying(2, 7);
         break;
     }
 
@@ -207,10 +218,12 @@ void checkIfNoteHasPlayedOrMuteImmediately(int board, int servo)
 {
     if (hasSetServoPosition(board, servo))
     {
+        // This will mute the note immediatly after it has been played
         replaceSetServoPosition(board, servo, getServoCenterPosition(board, servo));
     }
     else
     {
+        // The note was played, we can mute now
         moveServoCenter(board, servo);
     }
 }
@@ -371,30 +384,10 @@ void playSong(int song)
         increaseRemainingNotesCounter(pipiTheme);
         generateEventsFromPROGMEM(pipiTheme, millis());
     }
-    else if (song == PommerscheTheme)
-    {
-        increaseRemainingNotesCounter(pommerscheTheme);
-        generateEventsFromPROGMEM(pommerscheTheme, millis());
-    }
     else if (song == HttydImpro)
     {
         increaseRemainingNotesCounter(httydImpro);
         generateEventsFromPROGMEM(httydImpro, millis());
-    }
-    else if (song == FriendsTheme)
-    {
-        increaseRemainingNotesCounter(friendsTheme);
-        generateEventsFromPROGMEM(friendsTheme, millis());
-    }
-    else if (song == HttydYt)
-    {
-        increaseRemainingNotesCounter(httydYt);
-        generateEventsFromPROGMEM(httydYt, millis());
-    }
-    else if (song == InterstellarYt)
-    {
-        increaseRemainingNotesCounter(interstellarYt);
-        generateEventsFromPROGMEM(interstellarYt, millis());
     }
     else
     {
