@@ -25,15 +25,15 @@ int servoMax = 600;
 // Servo update frequency, analog servos typically run at ~50 Hz
 int servoFrequency = 50;
 
-int servoTravelTime = 100;
+int servoTravelTime = 120;
 int servoRelaxAmount = 20;
 
 // Left side servos work as expected, lower numbers = lower down
 // Left numbers are outer servos, towards the right -> towards the center
 #if PROTOTYPE1
-int leftServosUpPositions[9] = {122, 116, 110, 114, 114, 110, 108, 104, 96};
-int leftServosCenterPositions[9] = {92, 86, 80, 84, 84, 80, 78, 74, 66};
-int leftServosDownPositions[9] = {62, 56, 50, 54, 54, 50, 48, 44, 36};
+int leftServosUpPositions[9] = {120, 116, 114, 120, 108, 116, 112, 106, 104};
+int leftServosCenterPositions[9] = {91, 86, 83, 89, 78, 85, 81, 76, 74};
+int leftServosDownPositions[9] = {60, 56, 54, 60, 48, 56, 52, 46, 44};
 #else
 int leftServosUpPositions[9] = {108, 107, 105, 111, 101, 106, 104, 109, 111};
 int leftServosCenterPositions[9] = {78, 77, 75, 81, 71, 76, 74, 79, 81};
@@ -43,9 +43,9 @@ int leftServosDownPositions[9] = {48, 47, 45, 51, 41, 46, 44, 49, 51};
 // Right side servos work in opposite directions, bigger numbers = lower down
 // Left numbers are inner servos, towards the right -> towards outside
 #if PROTOTYPE1
-int rightServosUpPositions[9] = {72, 64, 70, 78, 74, 70, 70, 72};
-int rightServosCenterPositions[9] = {102, 94, 100, 108, 104, 100, 100, 102};
-int rightServosDownPositions[9] = {132, 124, 130, 138, 134, 130, 130, 132};
+int rightServosUpPositions[9] = {76, 60, 68, 66, 76, 80, 66, 76};
+int rightServosCenterPositions[9] = {106, 92, 99, 97, 103, 109, 96, 106};
+int rightServosDownPositions[9] = {136, 120, 128, 126, 136, 140, 126, 136};
 #else
 int rightServosUpPositions[9] = {34, 32, 36, 20, 36, 27, 27, 34};
 int rightServosCenterPositions[9] = {64, 62, 66, 50, 66, 57, 57, 64};
@@ -96,11 +96,11 @@ void adjustServoPosition(char restingPoint, char board, char servoChar, char dir
     int amountToAdd = 0;
     if (direction == '+')
     {
-        amountToAdd = 2;
+        amountToAdd = 1;
     }
     else if (direction == '-')
     {
-        amountToAdd = -2;
+        amountToAdd = -1;
     }
     else
     {
