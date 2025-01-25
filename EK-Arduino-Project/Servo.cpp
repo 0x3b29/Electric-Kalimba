@@ -36,7 +36,7 @@ int leftServosCenterPositions[9] = {91, 86, 83, 89, 78, 85, 81, 76, 74};
 int leftServosDownPositions[9] = {60, 56, 54, 60, 48, 56, 52, 46, 44};
 #else
 int leftServosUpPositions[9] = {108, 107, 105, 111, 101, 106, 104, 109, 111};
-int leftServosCenterPositions[9] = {78, 77, 75, 81, 71, 76, 74, 79, 81};
+int leftServosCenterPositions[9] = {78, 77, 74, 81, 71, 76, 71, 79, 81};
 int leftServosDownPositions[9] = {48, 47, 45, 51, 41, 46, 44, 49, 51};
 #endif
 

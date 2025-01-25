@@ -35,7 +35,7 @@ enum Song
     LuxembourgAnthem,
     AgeOfEmpiresTheme,
     PipiTheme,
-    PommerscheTheme,
-    HttydImpro
+    HttydImpro,
+    Ouverture,
 };
 #endif

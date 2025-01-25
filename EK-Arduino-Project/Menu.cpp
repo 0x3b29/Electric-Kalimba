@@ -29,6 +29,7 @@ MenuElement *songMenu[] = {new MenuElement((char *)"Age of Empires", PlaySong, n
                            new MenuElement((char *)"Luxebourg Anth.", PlaySong, new (EventArg[1]){EventArg(LuxembourgAnthem)}),
                            new MenuElement((char *)"Pipi Theme", PlaySong, new (EventArg[1]){EventArg(PipiTheme)}),
                            new MenuElement((char *)"HTTYD Impro", PlaySong, new (EventArg[1]){EventArg(HttydImpro)}),
+                           new MenuElement((char *)"Tell Ouverture", PlaySong, new (EventArg[1]){EventArg(Ouverture)}),
                            new MenuElement((char *)">> Stop All <<", EmptyQueue, NULL),
                            new MenuElement((char *)"Back", SetMenu, new (EventArg[1]){EventArg(MainMenu)})};
 
